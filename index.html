@@ -1,0 +1,921 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#2F6F60">
+<meta name="description" content="目標をちいさな一歩に分けて、やさしく続けられる目標達成トレーナー">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="manifest" href="manifest.webmanifest">
+<title>ちいさな一歩</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;500;700&display=swap">
+<style>
+/* Layout: one narrow column (max 560px) with a bottom tab bar; screens swap by hash. */
+:root{
+  --bg:#FBF8F3; --surface:#FFFFFF; --ink:#2B2A28; --muted:#5F5B55; --line:#E6E0D6;
+  --accent:#2F6F60; --accent-ink:#FFFFFF; --accent-soft:#E3F0EB; --accent-mid:#D6EAE2;
+  --warm:#8A4B0F; --warm-soft:#FFF4E5; --warm-line:#C9853F; --cheek:#F2B8A0; --sun:#C23B32; --sat:#2E62B0;
+  --font:'M PLUS Rounded 1c', 'Hiragino Maru Gothic ProN', 'Hiragino Sans', 'Yu Gothic', sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#1C1B19; --surface:#262522; --ink:#F1EDE6; --muted:#B5AEA3; --line:#3A3833;
+  --accent:#7CC4AF; --accent-ink:#10231E; --accent-soft:#22332E; --accent-mid:#2C453E;
+  --warm:#F0B878; --warm-soft:#33291D; --warm-line:#B9803F; --cheek:#C98B78; --sun:#FF8E86; --sat:#8DB8FF; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#1C1B19; --surface:#262522; --ink:#F1EDE6; --muted:#B5AEA3; --line:#3A3833;
+  --accent:#7CC4AF; --accent-ink:#10231E; --accent-soft:#22332E; --accent-mid:#2C453E;
+  --warm:#F0B878; --warm-soft:#33291D; --warm-line:#B9803F; --cheek:#C98B78; --sun:#FF8E86; --sat:#8DB8FF; color-scheme:dark}
+html,body{height:100%}
+body{background:var(--bg);color:var(--ink);font-family:var(--font);font-size:15px;line-height:1.6}
+*{box-sizing:border-box}
+button,input,textarea,select{font:inherit;color:inherit}
+.wrap{max-width:560px;margin:0 auto;padding-left:max(16px, env(safe-area-inset-left, 0px));padding-right:max(16px, env(safe-area-inset-right, 0px));padding-block:16px 110px;display:flex;flex-direction:column;gap:14px}
+h1,h2,h3{margin:0;text-wrap:balance}
+h1{font-size:22px} h2{font-size:17px} h3{font-size:15px}
+p{margin:0}
+.muted{color:var(--muted)} .small{font-size:13px} .xs{font-size:12px}
+.card{background:var(--surface);border-radius:16px;padding:14px 16px;display:flex;flex-direction:column;gap:8px;border:1px solid var(--line)}
+.soft{background:var(--accent-soft);border-color:transparent}
+.warm{background:var(--warm-soft);border-color:transparent}
+.row{display:flex;gap:10px;align-items:center}
+.row.wrap-row{flex-wrap:wrap}
+.grow{flex:1;min-width:0}
+.btn{min-height:44px;border-radius:22px;padding:0 18px;border:2px solid var(--accent);background:var(--accent);color:var(--accent-ink);font-weight:700;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:6px;text-decoration:none}
+.btn.ghost{background:var(--surface);color:var(--accent)}
+.btn.warmb{background:var(--surface);color:var(--warm);border-color:var(--warm-line)}
+.btn.block{width:100%;min-height:52px;border-radius:26px;font-size:16px}
+.btn.sm{min-height:36px;padding:0 12px;font-size:13px;border-radius:18px}
+.link{background:none;border:none;color:var(--accent);text-decoration:underline;cursor:pointer;padding:6px 0;min-height:36px;font-size:13px;text-align:left}
+.btn:focus-visible,.link:focus-visible,.chip:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible,.tab:focus-visible,.daycell:focus-visible{outline:3px solid var(--warm-line);outline-offset:2px}
+label.fld{display:flex;flex-direction:column;gap:4px;font-size:13px;color:var(--muted)}
+input[type=text],input[type=date],input[type=time],input[type=number],textarea,select{width:100%;border:2px solid var(--line);border-radius:12px;background:var(--surface);padding:10px 12px;font-size:15px;color:var(--ink)}
+textarea{min-height:76px;resize:vertical}
+.chip{min-height:40px;padding:0 14px;border-radius:20px;border:2px solid var(--line);background:var(--surface);cursor:pointer;font-size:14px}
+.chip.on{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);font-weight:700}
+.goalcard .big{font-size:20px;font-weight:700}
+.num{font-size:26px;font-weight:700;color:var(--accent);font-variant-numeric:tabular-nums}
+.bubble{background:var(--accent-soft);border-radius:4px 16px 16px 16px;padding:10px 14px;font-size:14px}
+.pipo{display:flex;flex-direction:column;align-items:center;gap:0;flex-shrink:0}
+.task{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:10px 12px;display:flex;flex-direction:column;gap:6px}
+.task.goal{border:2px solid var(--accent)}
+.task.done .ttl{text-decoration:line-through;color:var(--muted)}
+.ttl{font-size:15px}
+.time{font-size:12px;color:var(--accent);font-weight:700;font-variant-numeric:tabular-nums}
+.tabs{position:fixed;left:0;right:0;bottom:0;background:var(--surface);border-top:1px solid var(--line);padding-left:max(4px, env(safe-area-inset-left, 0px));padding-right:max(4px, env(safe-area-inset-right, 0px));padding-bottom:calc(6px + env(safe-area-inset-bottom, 0px));padding-top:4px;z-index:5}
+.tabs nav{max-width:560px;margin:0 auto;display:grid;grid-template-columns:repeat(5,minmax(0,1fr))}
+.tab{min-height:48px;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:11px;color:var(--muted);text-decoration:none;gap:2px}
+.tab svg{width:22px;height:22px}
+.tab.on{color:var(--accent);font-weight:700}
+.seg{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));background:var(--line);border-radius:22px;padding:3px}
+.seg button{border:none;background:none;min-height:38px;border-radius:19px;cursor:pointer;color:var(--muted)}
+.seg button.on{background:var(--surface);color:var(--ink);font-weight:700}
+.daygrid{position:relative;border-left:1px solid var(--line);margin-left:44px}
+.hr{position:absolute;left:-44px;right:0;height:0;border-top:1px solid var(--line)}
+.hr span{position:absolute;left:0;top:-9px;width:38px;text-align:right;font-size:11px;color:var(--muted);font-variant-numeric:tabular-nums}
+.blk{position:absolute;left:6px;right:4px;border-radius:8px;padding:2px 8px;font-size:12px;overflow:hidden;cursor:pointer;border:none;text-align:left;display:flex;align-items:flex-start;gap:6px}
+.blk.fixed{background:var(--line);color:var(--muted)}
+.blk.goal{background:var(--accent);color:var(--accent-ink);font-weight:700}
+.blk.task{background:var(--accent-mid);color:var(--ink);font-weight:700}
+.blk.donex{opacity:.6}
+.nowline{position:absolute;left:-6px;right:0;height:2px;background:var(--warm-line)}
+.cal{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:2px;text-align:center}
+.daycell{border:none;background:none;min-height:50px;display:flex;flex-direction:column;align-items:center;gap:4px;padding-top:4px;cursor:pointer;border-radius:10px}
+.daycell .d{width:28px;height:28px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:13px;font-variant-numeric:tabular-nums}
+.daycell.today .d{background:var(--accent);color:var(--accent-ink);font-weight:700}
+.daycell.sun .d{color:var(--sun)} .daycell.sat .d{color:var(--sat)}
+.daycell.today.sun .d,.daycell.today.sat .d{color:var(--accent-ink)}
+.daycell.goalday .d{box-shadow:0 0 0 2px var(--warm-line);font-weight:700}
+.daycell.goalday{background:var(--warm-soft)}
+.gl{font-size:10px;color:var(--warm);font-weight:700;line-height:1}
+.mini i.goal{background:var(--warm-line)}
+.dot{width:8px;height:8px;border-radius:4px}
+.dot.done{background:var(--accent)} .dot.rest{border:1.5px solid var(--muted)} .dot.plan{background:var(--accent-mid)}
+.yeargrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+@media (min-width:520px){.yeargrid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+.mini{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:2px}
+.mini i{aspect-ratio:1;border-radius:3px;background:transparent;display:flex;align-items:center;justify-content:center;font-style:normal;font-size:10px;line-height:1;font-variant-numeric:tabular-nums;color:var(--ink);max-width:100%}
+.mini i.on{background:var(--accent);color:var(--accent-ink)} .mini i.blank{background:transparent}
+.mini i.sun{color:var(--sun)} .mini i.sat{color:var(--sat)} .mini i.on.sun,.mini i.on.sat{color:var(--accent-ink)}
+.mini i.goal{background:var(--warm-line);color:#fff;font-weight:700} .mini i.today{box-shadow:inset 0 0 0 1.5px var(--accent);font-weight:700}
+.mini b{font-size:9px;font-weight:400;text-align:center;color:var(--muted)}
+.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.stat{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:10px 6px;text-align:center}
+.progress{height:6px;background:var(--line);border-radius:3px;overflow:hidden}
+.progress i{display:block;height:100%;background:var(--accent)}
+.overlay{position:fixed;inset:0;background:var(--bg);z-index:20;overflow:auto}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(84px + env(safe-area-inset-bottom, 0px));background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:14px;z-index:30;font-size:14px;max-width:calc(100% - 32px)}
+.timer{font-size:56px;font-weight:700;text-align:center;font-variant-numeric:tabular-nums;color:var(--accent)}
+.banner{background:var(--warm-soft);border-radius:14px;padding:10px 14px;font-size:14px}
+.check{display:flex;align-items:center;gap:10px;min-height:44px}
+.check input{width:22px;height:22px;accent-color:var(--accent)}
+.gdot{display:inline-block;width:10px;height:10px;border-radius:5px;flex-shrink:0;margin-right:6px;vertical-align:middle}
+.badge{font-size:11px;font-weight:700;color:var(--accent);background:var(--accent-soft);border-radius:10px;padding:2px 8px;white-space:nowrap}
+.sw{width:32px;height:32px;border-radius:16px;border:3px solid transparent;cursor:pointer}
+.sw.on{border-color:var(--ink)}
+canvas.prev{width:100%;max-width:100%;height:auto;border-radius:12px;border:1px solid var(--line)}
+@media (prefers-reduced-motion: no-preference){.pop{animation:pop .35s ease}@keyframes pop{from{transform:scale(.96);opacity:.6}to{transform:none;opacity:1}}}
+</style>
+
+</head>
+<body>
+<div id="app"><div class="wrap"><p class="muted">読み込み中…</p></div></div>
+<div class="tabs" id="tabs"><nav aria-label="メニュー">
+<a class="tab" href="#home" data-tab="home"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/></svg>ホーム</a>
+<a class="tab" href="#day" data-tab="day"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>今日の予定</a>
+<a class="tab" href="#calendar" data-tab="calendar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>カレンダー</a>
+<a class="tab" href="#review" data-tab="review"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 19V9M10 19V5M16 19v-7M22 19H2"/></svg>ふりかえり</a>
+<a class="tab" href="#more" data-tab="more"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="5" cy="12" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="19" cy="12" r="1.5"/></svg>目標・設定</a>
+</nav></div>
+
+<script>
+(function(){
+'use strict';
+/* ---------- utilities ---------- */
+const $app = document.getElementById('app');
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const pad = n => String(n).padStart(2,'0');
+const dkey = d => d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());
+const parseKey = k => { const [y,m,d] = k.split('-').map(Number); return new Date(y, m-1, d); };
+const addDays = (d,n) => { const x = new Date(d); x.setDate(x.getDate()+n); return x; };
+const todayKey = () => dkey(new Date());
+const WD = ['日','月','火','水','木','金','土'];
+const fmtDate = k => { const d = parseKey(k); return (d.getMonth()+1)+'月'+d.getDate()+'日（'+WD[d.getDay()]+'）'; };
+const toMin = t => { if(!t) return 0; const [h,m] = t.split(':').map(Number); return h*60+m; };
+const toHM = m => pad(Math.floor(m/60)%24)+':'+pad(m%60);
+const uid = () => Math.random().toString(36).slice(2,10);
+const daysBetween = (a,b) => Math.round((parseKey(b)-parseKey(a))/864e5);
+const HOL = {};
+function holidaysOf(y){
+  if (HOL[y]) return HOL[y];
+  const m = {}; const add = (mo,d,n) => { m[y+'-'+pad(mo)+'-'+pad(d)] = n; };
+  const nthMon = (mo,n) => { const f = new Date(y, mo-1, 1).getDay(); return 1 + ((8 - f) % 7) + (n-1)*7; };
+  add(1,1,'元日'); add(1,nthMon(1,2),'成人の日'); add(2,11,'建国記念の日'); add(2,23,'天皇誕生日');
+  add(3, Math.floor(20.8431 + 0.242194*(y-1980) - Math.floor((y-1980)/4)), '春分の日');
+  add(4,29,'昭和の日'); add(5,3,'憲法記念日'); add(5,4,'みどりの日'); add(5,5,'こどもの日');
+  add(7,nthMon(7,3),'海の日'); add(8,11,'山の日'); add(9,nthMon(9,3),'敬老の日');
+  add(9, Math.floor(23.2488 + 0.242194*(y-1980) - Math.floor((y-1980)/4)), '秋分の日');
+  add(10,nthMon(10,2),'スポーツの日'); add(11,3,'文化の日'); add(11,23,'勤労感謝の日');
+  // a weekday sandwiched between two holidays
+  for (let d = new Date(y,0,2); d.getFullYear()===y; d.setDate(d.getDate()+1)) { const k = dkey(d); if (!m[k] && d.getDay()!==0 && m[dkey(addDays(d,-1))] && m[dkey(addDays(d,1))]) m[k] = '国民の休日'; }
+  // substitute holiday: a holiday on Sunday moves to the next non-holiday day
+  for (const k of Object.keys(m).sort()) { const d = parseKey(k); if (d.getDay()===0 && m[k] !== '振替休日') { let n = addDays(d,1); while (m[dkey(n)]) n = addDays(n,1); if (n.getFullYear()===y) m[dkey(n)] = '振替休日'; } }
+  return HOL[y] = m;
+}
+const holidayName = k => holidaysOf(parseKey(k).getFullYear())[k] || '';
+const dayTone = k => { const d = parseKey(k).getDay(); return (d===0 || holidayName(k)) ? 'sun' : d===6 ? 'sat' : ''; };
+const isGoalDay = k => S.goals.some(g => g.due === k);
+function hashOf(s){ let h=0; for(const c of s) h=(h*31+c.charCodeAt(0))|0; return Math.abs(h); }
+
+/* ---------- content ---------- */
+const TEMPLATES = [
+ {id:'exam', name:'資格試験・テスト', goal:'TOEIC 750点を取る', criteria:'スコア表で750点以上', task:'試験日を調べて申し込む', ms:'模試で650点 → 本番申し込み → 750点'},
+ {id:'body', name:'ダイエット・運動', goal:'3か月で5kg減らす', criteria:'体重計で目標体重以下', task:'今の体重を測って記録する', ms:'1か月で2kg → 2か月で4kg → 5kg'},
+ {id:'app', name:'アプリをリリース', goal:'自分のアプリを公開する', criteria:'誰でも開けるURLで公開されている', task:'アプリでできることを3つ書き出す', ms:'画面のラフ → 動く試作 → 公開'},
+ {id:'note', name:'有料noteを販売', goal:'有料noteを1本公開して売る', criteria:'1部以上売れる', task:'書くテーマの候補を5つ出す', ms:'テーマ決定 → 下書き完成 → 公開'},
+ {id:'job', name:'再就職・転職', goal:'○月までに再就職する', criteria:'内定をもらう', task:'希望する条件を書き出す', ms:'応募書類完成 → 5社応募 → 内定'},
+ {id:'side', name:'副業で稼ぐ（アフィリエイト・SNS）', goal:'副業で月30,000円稼ぐ', criteria:'管理画面で月30,000円以上の収益', task:'発信するジャンルを決める', ms:'記事10本公開 → 初収益 → 月30,000円'},
+ {id:'other', name:'その他', goal:'', criteria:'', task:'', ms:''}
+];
+const NEEDS = [
+ ['knowledge','どんな知識が必要？'],['skill','どんなスキルが必要？'],['tool','どんな道具・ツールが必要？'],
+ ['mind','どんな考え方が必要？'],['exp','どんな経験が必要？'],['method','どんなやり方が必要？'],['steps','どんなステップで進む？']
+];
+const CHALLENGES = ['いつもと違う道で帰ってみる','コンビニでいつもと違う飲み物を買う','10分だけ散歩する','初めてのお店に入ってみる','いつもより10分早く起きる','聴いたことのないジャンルの曲を1曲聴く','新しい料理を1品作ってみる','普段話さない人に挨拶する','利き手と反対の手で歯をみがく','読んだことのない分野の記事を1つ読む','いつもと違う席に座る','5分だけ机の上を片付ける','新しいアプリやツールを1つ試す','自分をほめる言葉を1つ書く','階段を使ってみる','初めての公園やお店を地図で探す','朝、白湯を1杯飲む','スマホを置いて15分過ごす','お礼のメッセージを1通送る','ストレッチを3分する'];
+const GREET = {
+ morning:['おはようございます。今日も15分だけ、いっしょに進めましょう。','おはようございます。まずは準備だけでもOKです。','おはようございます。今日のちいさな一歩、何にしましょう？'],
+ day:['こんにちは。すき間の5分も、立派な一歩です。','こんにちは。今日の予定、無理のない量ですか？','こんにちは。できたことを1つ数えてみましょう。'],
+ night:['こんばんは。今日もおつかれさまでした。','こんばんは。明日の準備をひとつだけしておきませんか？','こんばんは。今日はゆっくり休むのも大事な予定です。']
+};
+const PRAISE = ['やりましたね！今日の一歩、ちゃんと目標に近づきました。','始められたこと自体がすごいです。','この積み重ねが、目標までの道になります。','おつかれさまでした。続ける人のやり方ですね。'];
+const REASONS = [
+ {id:'forgot',label:'忘れていた',tip:'朝いちばんにこのページを開く習慣を作りましょう。目標入りの壁紙もおすすめです（目標・設定から作れます）。',feat:1},
+ {id:'unclear',label:'何をするか迷った',tip:'「必要なもの」の7つの問いを見直して、タスクを1つ足してみましょう。',feat:2},
+ {id:'heavy',label:'気が重かった',tip:'タスクを「もっと小さくする」で、5分でできる大きさまで分けてみましょう。',feat:3},
+ {id:'busy',label:'時間がなかった',tip:'目標タイムを短くしても大丈夫です。10分からでも続けられる時間帯に置き直しましょう。',feat:4},
+ {id:'distract',label:'つい他のことをした',tip:'始める前のチェックで、スマホを別の部屋に置いてみましょう。',feat:6},
+ {id:'goal',label:'気持ちが乗らなかった',tip:'目標が今の自分に合っているか、目標チェックの2つの問いで見直してみましょう。',feat:5},
+ {id:'anxious',label:'不安だった',tip:'一番小さな一歩を1つだけ決めて、そこから始めましょう。ちいさな挑戦で慣らしていくのも効果的です。',feat:7}
+];
+const GOAL_COLORS = ['#2F6F60','#3D6FA8','#B0623A','#7A5BA6','#A8466B'];
+const MAX_GOALS = 5;
+const WP_MSGS = ['今日もちいさな一歩が、目標への大きな一歩となりますように。','今日もちいさな一歩、いっしょに進もう！','休んでも大丈夫。また始めればOKだよ','できたことを数えよう。ちゃんと近づいてるよ','5分だけでも、立派な一歩だよ'];
+const COLORS = [['#2F6F60','みどり'],['#3D6FA8','あお'],['#B0623A','オレンジ'],['#7A5BA6','むらさき'],['#A8466B','ピンク']];
+
+/* ---------- state ---------- */
+function blankState(){
+  return { v:2, goals:[], mainGoal:null, tasks:[], routine:[], oneoffs:[], skips:{}, done:{}, log:{}, reviews:{}, env:['スマホを別の部屋に置く','机の上を片付ける','飲み物を用意する'], settings:{partner:'ピポ', color:'#2F6F60', challengeOffset:{}}, lastOpen:null, created: todayKey() };
+}
+let S = blankState();
+let db = null, docRef = null, saveTimer = null, ready = false, storeMode = 'loading', dirty = false;
+let ui = { calView:'month', calMonth:null, day:todayKey(), wiz:null, timer:null, splitFor:null, welcome:false, msg:null, review:{weekOf:null}, editBlk:null };
+
+/* ---------- goals (up to 5; one is the main goal) ---------- */
+function G(){ return S.goals.find(g=>g.id===S.mainGoal) || S.goals[0] || null; }
+function goalById(id){ return id ? (S.goals.find(g=>g.id===id) || null) : null; }
+function goalOrder(){ const m=G(); return m ? [m].concat(S.goals.filter(g=>g!==m)) : []; }
+function goalColor(id){ const g=goalById(id)||G(); return g ? g.color : '#2F6F60'; }
+function gdot(id){ return S.goals.length>1 ? '<i class="gdot" style="background:'+goalColor(id)+'" aria-hidden="true"></i>' : ''; }
+function goalsDue(k){ return goalOrder().filter(g=>g.due===k); }
+function nextColor(){ return GOAL_COLORS.find(c=>!S.goals.some(g=>g.color===c)) || GOAL_COLORS[S.goals.length%GOAL_COLORS.length]; }
+function migrate(){
+  const before = JSON.stringify(S);
+  if (!Array.isArray(S.goals)) S.goals = [];
+  if (S['goal'] && !S.goals.length) S.goals.push(Object.assign({id:'g'+uid(), color:GOAL_COLORS[0]}, S['goal']));
+  delete S['goal'];
+  S.goals.forEach((g,i)=>{ if(!g.id) g.id='g'+uid(); if(!g.color) g.color=GOAL_COLORS[i%GOAL_COLORS.length]; });
+  if (!goalById(S.mainGoal)) S.mainGoal = S.goals.length ? S.goals[0].id : null;
+  for (const t of S.tasks) if (!goalById(t.goalId)) t.goalId = S.mainGoal;
+  return JSON.stringify(S) !== before;
+}
+function wpGoal(){ return goalById(ui.wpGoal) || G(); }
+function wpMsg(){ const m=(S.settings.wpMsg||'').trim(); return (!m || m==='今日もちいさな一歩、いっしょに進もう！') ? WP_MSGS[0] : m; }
+function routineLabel(r){
+  if (r.kind!=='goal') return esc(r.title);
+  if (S.goals.length<2) return '目標タイム';
+  const g = goalById(r.goalId); return gdot(g?g.id:null)+'目標タイム（'+(g?esc(g.title):'おまかせ')+'）';
+}
+function goalSelect(id, label){
+  if (S.goals.length<2) return '';
+  return '<label class="fld">'+label+'<select id="'+id+'"><option value="">おまかせ（いちばん大事な目標から）</option>'+goalOrder().map(g=>'<option value="'+g.id+'">'+esc(g.title)+'</option>').join('')+'</select></label>';
+}
+
+function save(){
+  clearTimeout(saveTimer); dirty = true;
+  saveTimer = setTimeout(() => { try { localStorage.setItem('chiisana-ippo', JSON.stringify(S)); dirty = false; } catch(e){ toast('保存できませんでした。ブラウザの設定をご確認ください。'); } }, 300);
+}
+function logOf(k){ return S.log[k] || (S.log[k] = {goal:0, minutes:0, tasks:0, challenge:false}); }
+
+/* ---------- task tree ---------- */
+function children(id){ return S.tasks.filter(t => (t.parentId||null) === id); }
+function ordered(){ const out=[]; const walk=(pid,depth)=>{ for(const t of children(pid)){ out.push({t,depth}); walk(t.id, depth+1);} }; walk(null,0); return out; }
+function leaves(){ return ordered().map(o=>o.t).filter(t => children(t.id).length===0); }
+function nextTasks(gid){ const ls = leaves().filter(t => !t.done); if (gid) return ls.filter(t=>t.goalId===gid); const ord = goalOrder().map(g=>g.id); return ls.sort((a,b)=>ord.indexOf(a.goalId)-ord.indexOf(b.goalId)); }
+function setDone(task, on, k){
+  task.done = on; task.doneAt = on ? (k||todayKey()) : null;
+  const L = logOf(k||todayKey()); L.tasks = Math.max(0, (L.tasks||0) + (on?1:-1));
+  // parent completes when all children are done
+  let p = task.parentId ? S.tasks.find(x=>x.id===task.parentId) : null;
+  while (p) { const kids = children(p.id); p.done = kids.every(c=>c.done); p.doneAt = p.done ? (k||todayKey()) : null; p = p.parentId ? S.tasks.find(x=>x.id===p.parentId) : null; }
+}
+
+/* ---------- day plan ---------- */
+function itemsFor(k){
+  const wd = parseKey(k).getDay();
+  const skips = S.skips[k] || [];
+  const items = [];
+  for (const r of S.routine) if (r.days.includes(wd) && !skips.includes(r.id)) items.push({key:'r:'+r.id, rid:r.id, start:r.start, end:r.end, title:r.title, kind:r.kind, goalId:r.goalId||null});
+  for (const o of S.oneoffs) if (o.date === k) items.push({key:'o:'+o.id, oid:o.id, start:o.start, end:o.end, title:o.title, kind:o.kind, taskId:o.taskId||null, goalId:o.goalId||null});
+  items.sort((a,b)=>toMin(a.start)-toMin(b.start));
+  // fill goal-time slots with the next unfinished tasks
+  const doneMap = S.done[k] || {};
+  // a slot tied to a goal takes that goal's tasks; "おまかせ" takes the main goal's first
+  const used = new Set(items.map(i=>i.taskId).filter(Boolean));
+  const pools = {}; const pool = gid => pools[gid] || (pools[gid] = nextTasks(gid));
+  const take = gid => { const ids = goalById(gid) ? [gid] : goalOrder().map(g=>g.id); for (const id of ids) { const p = pool(id); while (p.length) { const t = p.shift(); if (!used.has(t.id)) { used.add(t.id); return t; } } } return null; };
+  for (const it of items) {
+    it.done = !!doneMap[it.key];
+    if (it.kind === 'goal') {
+      if (doneMap[it.key] && doneMap[it.key].taskId) { it.task = S.tasks.find(t=>t.id===doneMap[it.key].taskId) || null; if (it.task) used.add(it.task.id); }
+      else if (k >= todayKey()) it.task = take(it.goalId);
+    }
+    if (it.kind === 'task' && it.taskId) it.task = S.tasks.find(t=>t.id===it.taskId) || null;
+  }
+  return items;
+}
+function plannedGoal(k){ return itemsFor(k).some(i=>i.kind==='goal'); }
+function activeDays(){ return Object.keys(S.log).filter(k => { const L=S.log[k]; return L.goal>0 || L.tasks>0 || L.challenge; }).length; }
+
+/* ---------- partner (Pipo) ---------- */
+function pipo(size, mood){
+  const c = S.settings.color || '#2F6F60';
+  const eyes = mood==='happy' || mood==='wave'
+    ? '<path d="M22 31 q4 -5 8 0" stroke="#fff" stroke-width="2.5" fill="none" stroke-linecap="round"/><path d="M34 31 q4 -5 8 0" stroke="#fff" stroke-width="2.5" fill="none" stroke-linecap="round"/><path d="M27 35 q5 5 10 0" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round"/>'
+    : '<circle cx="26" cy="30" r="3.5" fill="#fff"/><circle cx="38" cy="30" r="3.5" fill="#fff"/><path d="M28 36 q4 3 8 0" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round"/>';
+  const arm = mood==='wave' ? '<path d="M54 30 l6 -8" stroke="'+c+'" stroke-width="3" stroke-linecap="round"/><circle cx="61" cy="20" r="2.5" fill="#fff" stroke="'+c+'" stroke-width="2"/>' : '';
+  return '<svg width="'+size+'" height="'+size+'" viewBox="0 0 64 64" role="img" aria-label="相棒の'+esc(S.settings.partner)+'"><line x1="32" y1="7" x2="32" y2="15" stroke="'+c+'" stroke-width="3" stroke-linecap="round"/><circle cx="32" cy="6" r="4" fill="#C9853F"/><rect x="10" y="15" width="44" height="34" rx="16" fill="#fff" stroke="'+c+'" stroke-width="3"/><rect x="17" y="21" width="30" height="21" rx="10" fill="'+c+'"/>'+eyes+'<circle cx="14" cy="38" r="2.5" fill="#F2B8A0"/><circle cx="50" cy="38" r="2.5" fill="#F2B8A0"/><rect x="21" y="50" width="22" height="10" rx="5" fill="#fff" stroke="'+c+'" stroke-width="3"/>'+arm+'</svg>';
+}
+function say(text, mood){ return '<div class="row" style="align-items:flex-start"><div class="pipo">'+pipo(48, mood||'normal')+'<span class="xs muted">'+esc(S.settings.partner)+'</span></div><div class="bubble grow pop">'+esc(text)+'</div></div>'; }
+function greeting(){
+  const h = new Date().getHours(); const set = h<11 ? GREET.morning : h<17 ? GREET.day : GREET.night;
+  return set[hashOf(todayKey())%set.length];
+}
+
+/* ---------- toast & reminders ---------- */
+let toastT=null;
+function toast(msg){ let el=document.getElementById('toast'); if(!el){ el=document.createElement('div'); el.id='toast'; el.className='toast'; el.setAttribute('role','status'); document.body.appendChild(el);} el.textContent=msg; el.hidden=false; clearTimeout(toastT); toastT=setTimeout(()=>{el.hidden=true;},4000); }
+const reminded = {};
+setInterval(() => {
+  if (!ready || !S.goals.length) return;
+  const k = todayKey(), now = new Date(); const m = now.getHours()*60+now.getMinutes();
+  for (const it of itemsFor(k)) {
+    if (it.kind==='fixed' || it.done) continue;
+    const st = toMin(it.start);
+    if (m >= st-5 && m <= st && !reminded[k+it.key]) { reminded[k+it.key]=true; ui.msg = 'そろそろ「'+(it.task?it.task.title:it.title)+'」の時間です（'+it.start+'）。まずは準備だけでもOKです。'; render(); }
+  }
+}, 30000);
+
+/* ---------- router ---------- */
+function route(){ const h = (location.hash||'').replace('#',''); return ['home','day','calendar','review','more','setup'].includes(h) ? h : 'home'; }
+window.addEventListener('hashchange', () => { render(); window.scrollTo(0,0); });
+
+function render(){
+  const r = route();
+  document.querySelectorAll('.tab').forEach(a => { const on = a.dataset.tab===r || (r==='setup' && a.dataset.tab==='more'); a.classList.toggle('on', on); if(on) a.setAttribute('aria-current','page'); else a.removeAttribute('aria-current'); });
+  document.getElementById('tabs').hidden = (r==='setup' || !!ui.timer);
+  if (!ready) return;
+  let html = '';
+  if (ui.timer) html = viewTimer();
+  else if (r==='setup' || (!S.goals.length && r!=='more')) html = viewSetup();
+  else if (r==='home') html = viewHome();
+  else if (r==='day') html = viewDay();
+  else if (r==='calendar') html = viewCalendar();
+  else if (r==='review') html = viewReview();
+  else if (r==='more') html = viewMore();
+  if (ui.welcome && !ui.timer && G()) html += viewWelcome();
+  $app.innerHTML = html;
+  if (r==='more' && !ui.timer) drawWallpaper();
+  if (r==='day' && !ui.timer) { const g=document.getElementById('daygrid'); if(g && ui.day===todayKey()){ const now=new Date(); const y=(now.getHours()*60+now.getMinutes())*0.7; const sc=g.closest('.scrollbox'); if(sc) sc.scrollTop=Math.max(0,y-120);} }
+}
+
+/* ---------- HOME ---------- */
+function viewHome(){
+  const k = todayKey(), g = G();
+  const left = g.due ? daysBetween(k, g.due) : null;
+  const items = itemsFor(k).filter(i=>i.kind!=='fixed');
+  const off = (S.settings.challengeOffset||{})[k]||0;
+  const ch = CHALLENGES[(hashOf(k)+off)%CHALLENGES.length];
+  const L = S.log[k]||{};
+  const undated = nextTasks().filter(t=>!items.some(i=>i.task && i.task.id===t.id)).slice(0,3);
+  let h = '<div class="wrap">';
+  h += '<div class="row"><span class="grow" style="font-weight:700;color:var(--accent)">ちいさな一歩</span><span class="small muted">'+fmtDate(k)+'</span></div>';
+  
+  if (ui.msg) h += '<div class="banner" role="status">'+esc(ui.msg)+' <button class="link" data-act="dismissMsg">閉じる</button></div>';
+  h += '<section class="card goalcard" aria-label="わたしの目標"><span class="xs muted">'+(S.goals.length>1?'いちばん大事な目標':'わたしの目標')+'</span><span class="big">'+esc(g.title)+'</span>';
+  if (left!==null) h += '<div class="row" style="align-items:baseline;gap:6px"><span class="small muted">'+(left>=0?'達成日まであと':'達成日から')+'</span><span class="num">'+Math.abs(left)+'</span><span class="small muted">日'+(left<0?'たちました':'')+'（'+fmtDate(g.due)+'）</span></div>';
+  if (g.reason) h += '<p class="small muted">なぜ：'+esc(g.reason)+'</p>';
+  h += '</section>';
+  const others = goalOrder().slice(1);
+  if (others.length) { h += '<section class="card" aria-label="ほかの目標" style="gap:4px"><span class="xs muted">ほかの目標</span>';
+    for (const o of others) { const lf = o.due ? daysBetween(k, o.due) : null; h += '<div class="row" style="gap:0">'+gdot(o.id)+'<span class="grow small">'+esc(o.title)+'</span>'+(lf!==null&&lf>=0?'<span class="xs muted">あと'+lf+'日</span>':'')+'</div>'; }
+    h += '</section>'; }
+  h += say(ui.praise || greeting(), ui.praise ? 'happy' : 'normal');
+  h += '<section style="display:flex;flex-direction:column;gap:8px"><h2>今日のタスク</h2>';
+  if (!items.length && !undated.length) h += '<div class="card"><p class="small muted">今日の予定はまだありません。「今日の予定」から目標タイムを入れてみましょう。</p><a class="btn ghost sm" href="#day">今日の予定を開く</a></div>';
+  for (const it of items) h += taskRow(it, k);
+  if (undated.length) {
+    h += '<h3 class="small muted" style="margin-top:4px">次にやること</h3>';
+    for (const t of undated) h += taskRow({key:'t:'+t.id, kind:'free', task:t, title:t.title, done:t.done}, k);
+  }
+  h += '</section>';
+  h += '<section class="card warm"><div class="row wrap-row"><div class="grow"><span class="xs" style="color:var(--warm);font-weight:700">今日のちいさな挑戦</span><p>'+esc(ch)+'</p></div>';
+  h += L.challenge ? '<span class="small" style="color:var(--warm);font-weight:700">やってみた！</span>' : '<button class="btn warmb sm" data-act="challenge">やってみた</button><button class="link" data-act="challengeNext">別のにする</button>';
+  h += '</div></section>';
+  h += '<p class="small muted" style="text-align:center">これまでに取り組んだ日：合計 <b style="color:var(--ink)">'+activeDays()+'日</b></p>';
+  h += '</div>';
+  return h;
+}
+function taskRow(it, k){
+  const t = it.task; const title = t ? t.title : it.title;
+  const done = it.kind==='free' ? !!(t&&t.done) : (it.done || (t && t.done && it.kind==='task'));
+  const isGoal = it.kind==='goal';
+  let h = '<div class="task'+(isGoal?' goal':'')+(done?' done':'')+'">';
+  h += '<div class="row">';
+  if (!isGoal) h += '<input type="checkbox" id="ck-'+esc(it.key)+'" data-act="toggle" data-key="'+esc(it.key)+'" '+(done?'checked':'')+' style="width:22px;height:22px;accent-color:var(--accent)" aria-label="'+esc(title)+' を完了にする">';
+  h += '<div class="grow">';
+  if (it.start) h += '<span class="time">'+esc(it.start)+(it.end?'〜'+esc(it.end):'')+(isGoal?' 目標タイム':'')+'</span><br>';
+  if (S.goals.length>1 && (t || it.goalId)) h += gdot(t ? t.goalId : it.goalId);
+  h += '<span class="ttl">'+esc(isGoal ? (t ? t.title : (done?'目標タイム（完了）':'やることを決めましょう')) : title)+'</span>';
+  if (t && t.minutes) h += ' <span class="xs muted">約'+t.minutes+'分</span>';
+  h += '</div>';
+  if (isGoal && !done) h += '<button class="btn" data-act="start" data-key="'+esc(it.key)+'">始める</button>';
+  if (isGoal && done) h += '<span class="small" style="color:var(--accent);font-weight:700">できた</span>';
+  h += '</div>';
+  if (t && !done) {
+    if (ui.splitFor === t.id) h += splitForm(t);
+    else h += '<button class="link" data-act="split" data-id="'+t.id+'">気が重いときは「もっと小さくする」</button>';
+  }
+  h += '</div>';
+  return h;
+}
+function splitForm(t){
+  return '<div class="card soft" style="padding:10px 12px"><p class="small">「'+esc(t.title)+'」を分けてみましょう。</p><p class="xs muted">これを作っている要素は？ どんなステップで進められる？ 1行に1つずつ書いてください。</p><label class="fld"><span class="sr">小さなタスク</span><textarea id="split-text" placeholder="例：問題集を机に出す&#10;Part5を3問だけ解く&#10;答え合わせをする"></textarea></label><div class="row"><button class="btn sm" data-act="splitSave" data-id="'+t.id+'">分ける</button><button class="link" data-act="splitCancel">やめる</button></div></div>';
+}
+
+/* ---------- TIMER ---------- */
+function viewTimer(){
+  const T = ui.timer;
+  if (T.phase==='env') {
+    let h = '<div class="wrap"><h1>始める前に、環境を整えましょう</h1>'+say('意志の力より、環境の力。チェックできたら始めましょう。');
+    h += '<div class="card">';
+    S.env.forEach((e,i)=>{ h += '<label class="check"><input type="checkbox" id="env-'+i+'" data-act="envck" data-i="'+i+'" '+(T.env[i]?'checked':'')+'><span>'+esc(e)+'</span></label>'; });
+    h += '</div><div class="card"><p class="small"><b>'+esc(T.title)+'</b></p><label class="fld">時間（分）<input type="number" id="tm-min" min="1" max="180" value="'+T.minutes+'"></label></div>';
+    h += '<button class="btn block" data-act="timerGo">タイマーを始める</button><button class="link" data-act="timerCancel" style="align-self:center">やめる</button></div>';
+    return h;
+  }
+  const rem = Math.max(0, T.endAt - Date.now()); const mm = Math.floor(rem/60000), ss = Math.floor(rem/1000)%60;
+  let h = '<div class="wrap" style="align-items:stretch">';
+  h += '<p class="small muted" style="text-align:center">目標タイム</p><h1 style="text-align:center">'+esc(T.title)+'</h1>';
+  h += '<div style="display:flex;justify-content:center">'+pipo(96, rem===0?'happy':'normal')+'</div>';
+  h += '<div class="timer" id="timer-num" aria-live="off">'+pad(mm)+':'+pad(ss)+'</div>';
+  h += rem===0 ? say('時間です！おつかれさまでした。','happy') : '<p class="small muted" style="text-align:center">終わったら下のボタンを押してください。早く終わってもOKです。</p>';
+  h += '<button class="btn block" data-act="timerDone">できた！</button><button class="link" data-act="timerCancel" style="align-self:center">今日はここまでにする</button></div>';
+  return h;
+}
+let tick=null;
+function startTick(){ clearInterval(tick); tick=setInterval(()=>{ if(!ui.timer||ui.timer.phase!=='run'){clearInterval(tick);return;} const el=document.getElementById('timer-num'); const rem=Math.max(0,ui.timer.endAt-Date.now()); if(rem===0){ clearInterval(tick); render(); return;} if(el) el.textContent=pad(Math.floor(rem/60000))+':'+pad(Math.floor(rem/1000)%60); },1000); }
+
+/* ---------- SETUP WIZARD ---------- */
+function newWiz(gid){
+  const cur = gid==='new' ? null : (goalById(gid) || G()); const g = cur || {};
+  return { step: cur ? 1 : 0, gid: cur ? cur.id : null, tpl: g.tpl||null, title:g.title||'', due:g.due||'', reason:g.reason||'', future:g.future||'', criteria:g.criteria||'', milestones:g.milestones||'', q1:null, q2:null, needs:Object.assign({},g.needs||{}), tasks: [], goalStart:'07:00', goalMin:15, goalDays:[1,2,3,4,5], editing: !!cur };
+}
+const STEPS = ['目標の種類','目標と達成日','理由と未来','目標チェック','必要なもの','タスク','目標タイム'];
+function viewSetup(){
+  if (!ui.wiz) ui.wiz = newWiz(ui.wizGoal);
+  const W = ui.wiz; const n = STEPS.length;
+  let h = '<div class="wrap">';
+  h += '<div class="row"><button class="link" data-act="wizBack">'+(W.step===0 ? (S.goals.length?'閉じる':'') : 'もどる')+'</button><span class="grow small muted" style="text-align:center">ステップ '+(W.step+1)+' / '+n+'：'+STEPS[W.step]+'</span><span style="width:44px"></span></div>';
+  h += '<div class="progress" role="progressbar" aria-valuemin="1" aria-valuemax="'+n+'" aria-valuenow="'+(W.step+1)+'"><i style="width:'+Math.round((W.step+1)/n*100)+'%"></i></div>';
+  const tpl = TEMPLATES.find(t=>t.id===W.tpl) || TEMPLATES[TEMPLATES.length-1];
+  if (W.step===0){
+    h += '<h1>どんな目標に取り組みますか？</h1>'+say(W.editing?'目標を見直しましょう。':S.goals.length?'新しい目標ですね。いっしょに作りましょう。':'はじめまして、'+S.settings.partner+'です。いっしょに目標を作りましょう。','wave');
+    h += '<div class="row wrap-row">'; for (const t of TEMPLATES) h += '<button class="chip'+(W.tpl===t.id?' on':'')+'" data-act="tpl" data-id="'+t.id+'">'+esc(t.name)+'</button>'; h += '</div>';
+    h += '<p class="small muted">選ぶと、入力の見本が出ます。見本はそのまま使っても、書き換えてもOKです。</p>';
+  } else if (W.step===1){
+    h += '<h1>目標と、達成したい日</h1>';
+    h += '<label class="fld">目標<input type="text" id="w-title" value="'+esc(W.title)+'" placeholder="例：'+esc(tpl.goal||'達成したいこと')+'"></label>';
+    h += '<label class="fld">達成したい日<input type="date" id="w-due" value="'+esc(W.due)+'"></label>';
+    h += '<label class="fld">中間目標（ゴールまでの途中の目印・任意）<input type="text" id="w-ms" value="'+esc(W.milestones)+'" placeholder="例：'+esc(tpl.ms||'1か月後に〇〇')+'"></label>';
+    if (W.tpl==='side' || W.tpl==='note' || W.tpl==='app') h += '<div class="banner small">金額や結果の目標は、自分だけではコントロールしにくいもの。「毎週3本投稿する」のような行動の目標も、タスクや中間目標に入れておくと進めやすくなります。</div>';
+  } else if (W.step===2){
+    h += '<h1>なぜ、この目標を達成したいですか？</h1>';
+    h += '<label class="fld">理由<textarea id="w-reason" placeholder="例：海外の部署で働きたいから">'+esc(W.reason)+'</textarea></label>';
+    h += '<label class="fld">達成したら、どんな未来が待っていますか？<textarea id="w-future" placeholder="例：家族と海外旅行で、自分で道を聞ける">'+esc(W.future)+'</textarea></label>';
+  } else if (W.step===3){
+    h += '<h1>目標を、いっしょにチェックしましょう</h1>';
+    h += '<div class="card"><b>'+esc(W.title||'（目標がまだ空です）')+'</b><span class="small muted">'+(W.due?'達成日：'+fmtDate(W.due):'達成日：未設定')+'</span></div>';
+    h += '<label class="fld">何をもって「達成」としますか？<input type="text" id="w-crit" value="'+esc(W.criteria)+'" placeholder="例：'+esc(tpl.criteria||'数字や結果で確かめられる基準')+'"></label>';
+    h += yesno('q1','Q1. 達成できたかどうか、数字や結果で確かめられますか？', W.q1);
+    h += yesno('q2','Q2. この目標を、本当に達成したいと思えますか？', W.q2);
+    if (W.q1===false || W.q2===false) h += '<div class="banner small">大丈夫です。少しだけ目標を直してみましょう。'+(W.q1===false?'「達成の基準」を数字や結果で書くと確かめやすくなります。':'')+(W.q2===false?'「達成したら何がうれしいか」を考えて、心から目指したい形に言い換えてみましょう。':'')+' 直したら、もう一度「はい」を選んでください。</div>';
+  } else if (W.step===4){
+    h += '<h1>目標のために、何が必要ですか？</h1><p class="small muted">分かるものだけでOK。ここで書いた答えから、次のステップでタスクを作れます。</p>';
+    for (const [id,q] of NEEDS) h += '<label class="fld">'+q+'<input type="text" id="need-'+id+'" value="'+esc(W.needs[id]||'')+'"></label>';
+  } else if (W.step===5){
+    h += '<h1>やることを、小さく書き出しましょう</h1>';
+    h += '<p class="small muted">1行に1つ。15分以内でできる大きさがおすすめです。迷ったら「これを作っている要素は？」「どんなステップで進む？」と考えてみてください。</p>';
+    const fromNeeds = NEEDS.map(([id])=>W.needs[id]).filter(Boolean);
+    if (fromNeeds.length) h += '<div class="card soft"><span class="xs muted">必要なものメモ</span>'+fromNeeds.map(x=>'<span class="small">・'+esc(x)+'</span>').join('')+'</div>';
+    const existing = S.tasks.filter(t=>!t.parentId && W.gid && t.goalId===W.gid).map(t=>t.title);
+    if (existing.length) h += '<div class="card"><span class="xs muted">登録済みのタスク</span>'+existing.map(x=>'<span class="small">・'+esc(x)+'</span>').join('')+'</div>';
+    h += '<label class="fld">'+(existing.length?'追加するタスク':'タスク')+'<textarea id="w-tasks" style="min-height:140px" placeholder="例：'+esc(tpl.task||'最初にやること')+'">'+esc(W.tasks.join('\n'))+'</textarea></label>';
+    h += '<label class="fld">1つあたりの目安時間（分）<input type="number" id="w-tmin" min="1" max="120" value="'+(W.tmin||15)+'"></label>';
+  } else if (W.step===6){
+    h += '<h1>目標タイムを決めましょう</h1>'+say('最初は15分からがおすすめです。続けられたら少しずつ伸ばしましょう。');
+    h += '<div class="row"><label class="fld grow">開始時刻<input type="time" id="w-gs" value="'+esc(W.goalStart)+'"></label><label class="fld grow">時間（分）<input type="number" id="w-gm" min="5" max="180" value="'+W.goalMin+'"></label></div>';
+    h += '<span class="small muted">曜日</span><div class="row wrap-row">'; for (let d=0; d<7; d++) h += '<button class="chip'+(W.goalDays.includes(d)?' on':'')+'" data-act="wday" data-d="'+d+'" aria-pressed="'+W.goalDays.includes(d)+'">'+WD[d]+'</button>'; h += '</div>';
+    if (S.routine.some(r=>r.kind==='goal')) h += '<p class="small muted">すでに目標タイムがあります。'+(S.goals.length && !W.editing ? '追加すると、この目標専用の目標タイムになります。追加しない場合は、今ある「おまかせ」の目標タイムに、いちばん大事な目標のタスクのあとで入ります。' : 'ここで追加しない場合は「追加せずに保存」を選んでください。')+'</p>';
+    h += '<label class="fld">作業する場所と、始める前に整えること（1行に1つ）<textarea id="w-env">'+esc(S.env.join('\n'))+'</textarea></label>';
+  }
+  h += '<div style="margin-top:8px;display:flex;flex-direction:column;gap:8px">';
+  const canNext = W.step!==3 || (W.q1===true && W.q2===true && (W.title||'').trim());
+  if (W.step < n-1) h += '<button class="btn block" data-act="wizNext" '+(canNext?'':'disabled style="opacity:.5"')+'>次へ</button>';
+  else { h += '<button class="btn block" data-act="wizSave">保存して始める</button>'; if (S.routine.some(r=>r.kind==='goal')) h += '<button class="btn ghost block" data-act="wizSaveNoSlot">追加せずに保存</button>'; }
+  if (W.step===1 && !(W.title||'').trim()) h += '<p class="xs muted" style="text-align:center">目標が空のままでも、あとで書けます。</p>';
+  h += '</div></div>';
+  return h;
+}
+function yesno(id, q, val){
+  return '<div style="display:flex;flex-direction:column;gap:8px"><p>'+q+'</p><div class="row"><button class="chip grow'+(val===true?' on':'')+'" data-act="yn" data-q="'+id+'" data-v="1" aria-pressed="'+(val===true)+'">はい</button><button class="chip grow'+(val===false?' on':'')+'" data-act="yn" data-q="'+id+'" data-v="0" aria-pressed="'+(val===false)+'">いいえ</button></div></div>';
+}
+function readWiz(){
+  const W = ui.wiz; const v = id => { const el=document.getElementById(id); return el ? el.value : undefined; };
+  if (W.step===1){ W.title=v('w-title')??W.title; W.due=v('w-due')??W.due; W.milestones=v('w-ms')??W.milestones; }
+  if (W.step===2){ W.reason=v('w-reason')??W.reason; W.future=v('w-future')??W.future; }
+  if (W.step===3){ W.criteria=v('w-crit')??W.criteria; }
+  if (W.step===4){ for (const [id] of NEEDS){ const x=v('need-'+id); if(x!==undefined) W.needs[id]=x; } }
+  if (W.step===5){ const x=v('w-tasks'); if(x!==undefined) W.tasks=x.split('\n').map(s=>s.trim()).filter(Boolean); W.tmin=Number(v('w-tmin'))||15; }
+  if (W.step===6){ W.goalStart=v('w-gs')||W.goalStart; W.goalMin=Number(v('w-gm'))||W.goalMin; const e=v('w-env'); if(e!==undefined) W.env=e.split('\n').map(s=>s.trim()).filter(Boolean); }
+}
+function wizSave(addSlot){
+  readWiz(); const W = ui.wiz;
+  if (!goalById(W.gid) && S.goals.length >= MAX_GOALS) { toast('目標は'+MAX_GOALS+'つまでです。'); return; }
+  const data = { tpl:W.tpl, title:(W.title||'').trim() || '（目標を書きましょう）', due:W.due||'', reason:W.reason, future:W.future, criteria:W.criteria, milestones:W.milestones, needs:W.needs, checkedAt: todayKey() };
+  let g = goalById(W.gid);
+  if (g) Object.assign(g, data); else { g = Object.assign({id:'g'+uid(), color:nextColor()}, data); S.goals.push(g); if (!goalById(S.mainGoal)) S.mainGoal = g.id; }
+  for (const t of W.tasks) S.tasks.push({id:uid(), title:t, minutes:W.tmin||15, done:false, parentId:null, goalId:g.id});
+  if (W.env && W.env.length) S.env = W.env;
+  if (addSlot && W.goalDays.length) S.routine.push({id:uid(), kind:'goal', title:'目標タイム', start:W.goalStart, end:toHM(toMin(W.goalStart)+W.goalMin), days:W.goalDays.slice().sort(), goalId: S.goals.length>1 ? g.id : null});
+  ui.wiz = null; ui.wizGoal = null; ui.praise = W.editing ? '目標を自分に合わせて直せるのも、大事な力です。' : '目標を言葉にできたのは、大きな一歩です。これからいっしょに進みましょう。';
+  save(); location.hash = '#home'; render();
+}
+
+/* ---------- DAY (24h) ---------- */
+const PX = 0.7; // px per minute
+function viewDay(){
+  const k = ui.day; const items = itemsFor(k);
+  let h = '<div class="wrap">';
+  h += '<div class="seg" role="group" aria-label="表示の切り替え"><button class="on" data-act="calv" data-v="day">日</button><button data-act="calv" data-v="week">週</button><button data-act="calv" data-v="month">月</button><button data-act="calv" data-v="year">年</button></div>';
+  h += '<div class="row"><button class="btn ghost sm" data-act="dayPrev" aria-label="前の日">‹</button><h1 class="grow" style="text-align:center;font-size:18px;'+(dayTone(k)?'color:var(--'+dayTone(k)+')':'')+'">'+fmtDate(k)+(holidayName(k)?' <span class="xs">'+holidayName(k)+'</span>':'')+'</h1><button class="btn ghost sm" data-act="dayNext" aria-label="次の日">›</button></div>';
+  h += goalBar();
+  if (isGoalDay(k)) h += '<div class="card warm" style="border:2px solid var(--warm-line)"><b style="color:var(--warm)">'+(k===todayKey()?'今日':'この日')+'は目標達成日です</b>'+goalsDue(k).map(g=>'<span class="small">'+esc(g.title)+'</span>').join('')+'</div>';
+  if (k!==todayKey()) h += '<button class="link" data-act="dayToday">今日にもどる</button>';
+  h += '<div class="scrollbox" style="max-height:62vh;overflow:auto;border-radius:12px;background:var(--surface);border:1px solid var(--line);padding:10px 8px 10px 0"><div class="daygrid" id="daygrid" style="height:'+(24*60*PX)+'px">';
+  for (let i=0;i<24;i++) h += '<div class="hr" style="top:'+(i*60*PX)+'px"><span>'+i+':00</span></div>';
+  // lay out: fixed blocks full width, others narrower when overlapping fixed
+  for (const it of items) {
+    const s = toMin(it.start), e = Math.max(toMin(it.end)||s+15, s+15);
+    const top = s*PX, ht = Math.max(22, (e-s)*PX);
+    const overlapFixed = it.kind!=='fixed' && items.some(o=>o.kind==='fixed' && toMin(o.start)<e && (toMin(o.end)||0)>s);
+    const label = it.kind==='goal' ? '目標タイム'+(it.task?'：'+it.task.title:'') : (it.task?it.task.title:it.title);
+    const cls = it.kind==='goal'?'goal':it.kind==='fixed'?'fixed':'task';
+    const gc = it.kind==='goal' && S.goals.length>1 ? 'background:'+goalColor(it.goalId || (it.task && it.task.goalId))+';color:#fff;' : '';
+    h += '<button class="blk '+cls+(it.done?' donex':'')+'" data-act="editBlk" data-key="'+esc(it.key)+'" style="top:'+top+'px;height:'+ht+'px;'+gc+(overlapFixed?'left:40%;':'')+'"><span>'+esc(it.start)+' '+esc(label)+(it.done?' ✓':'')+'</span></button>';
+  }
+  if (k===todayKey()) { const n=new Date(); h += '<div class="nowline" style="top:'+((n.getHours()*60+n.getMinutes())*PX)+'px" aria-hidden="true"></div>'; }
+  h += '</div></div>';
+  if (ui.editBlk) h += editBlkForm(k);
+  h += '<section class="card"><h2>この日に予定を足す</h2>';
+  h += '<label class="fld">内容<input type="text" id="add-title" placeholder="例：英単語アプリを10分"></label>';
+  h += '<div class="row"><label class="fld grow">開始<input type="time" id="add-start" value="21:00"></label><label class="fld grow">終了<input type="time" id="add-end" value="21:15"></label></div>';
+  h += '<label class="fld">種類<select id="add-kind"><option value="task">タスク</option><option value="goal">目標タイム（次のタスクが自動で入る）</option><option value="fixed">いつもの予定以外の用事</option></select></label>';
+  h += goalSelect('add-goal', 'どの目標の目標タイム？（種類が目標タイムのとき）');
+  const nt = nextTasks();
+  if (nt.length) h += '<label class="fld">タスクから選ぶ（任意）<select id="add-task"><option value="">選ばない</option>'+nt.map(t=>'<option value="'+t.id+'">'+(S.goals.length>1 && goalById(t.goalId) ? '['+esc(goalById(t.goalId).title.slice(0,8))+'] ' : '')+esc(t.title)+'</option>').join('')+'</select></label>';
+  h += '<button class="btn" data-act="addOne">この日に追加</button></section>';
+  h += viewRoutine();
+  h += '</div>';
+  return h;
+}
+function editBlkForm(k){
+  const it = itemsFor(k).find(i=>i.key===ui.editBlk); if (!it) return '';
+  let h = '<section class="card soft"><h2>'+esc(it.kind==='goal'?'目標タイム':it.title)+'（'+esc(it.start)+'〜'+esc(it.end||'')+'）</h2>';
+  if (it.key.startsWith('r:')) h += '<p class="small muted">毎日のスケジュール設定から入っています。この日だけ変えても、繰り返しの設定は変わりません。</p>';
+  h += '<div class="row"><label class="fld grow">開始<input type="time" id="eb-start" value="'+esc(it.start)+'"></label><label class="fld grow">終了<input type="time" id="eb-end" value="'+esc(it.end||'')+'"></label></div>';
+  h += '<div class="row wrap-row"><button class="btn sm" data-act="ebSave">この日だけ時間を変える</button><button class="btn ghost sm" data-act="ebSkip">この日はお休みにする</button>';
+  if (it.kind!=='fixed') h += '<button class="btn ghost sm" data-act="ebDone">'+(it.done?'未完了にもどす':'できたにする')+'</button>';
+  h += '<button class="link" data-act="ebClose">閉じる</button></div></section>';
+  return h;
+}
+function viewRoutine(){
+  let h = '<section class="card"><h2>毎日のスケジュール設定</h2><p class="small muted">繰り返しの予定です。目標タイムには、未完了のタスクが上から順に自動で入ります。'+(S.goals.length>1?'「おまかせ」には、いちばん大事な目標のタスクから入ります。':'')+'</p>';
+  if (!S.routine.length) h += '<p class="small">まだありません。</p>';
+  for (const r of S.routine.slice().sort((a,b)=>toMin(a.start)-toMin(b.start))) {
+    h += '<div class="row" style="border-top:1px solid var(--line);padding-top:8px"><div class="grow"><span class="time">'+esc(r.start)+'〜'+esc(r.end)+'</span> <span class="xs muted">'+r.days.map(d=>WD[d]).join('・')+'</span><br><span>'+routineLabel(r)+'</span>'+(r.kind==='fixed'?' <span class="xs muted">いつもの予定</span>':'')+'</div><button class="btn ghost sm" data-act="delRoutine" data-id="'+r.id+'">削除</button></div>';
+  }
+  h += '<details><summary style="cursor:pointer;min-height:44px;display:flex;align-items:center;color:var(--accent);font-weight:700">＋ 繰り返しの予定を追加</summary><div style="display:flex;flex-direction:column;gap:8px">';
+  h += '<label class="fld">種類<select id="rt-kind"><option value="goal">目標タイム</option><option value="fixed">いつもの予定（仕事・睡眠など）</option><option value="task">決まったタスク</option></select></label>';
+  h += '<label class="fld">内容（いつもの予定・決まったタスクのとき）<input type="text" id="rt-title" placeholder="例：仕事"></label>';
+  h += goalSelect('rt-goal', 'どの目標の目標タイム？（種類が目標タイムのとき）');
+  h += '<div class="row"><label class="fld grow">開始<input type="time" id="rt-start" value="07:00"></label><label class="fld grow">終了<input type="time" id="rt-end" value="07:15"></label></div>';
+  h += '<div class="row wrap-row" id="rt-days">'; for (let d=0; d<7; d++) h += '<label class="check" style="min-height:36px"><input type="checkbox" value="'+d+'" '+(d>=1&&d<=5?'checked':'')+'>'+WD[d]+'</label>'; h += '</div>';
+  h += '<button class="btn" data-act="addRoutine">追加</button></div></details></section>';
+  return h;
+}
+
+/* ---------- CALENDAR ---------- */
+function goalBar(){
+  if (!S.goals.length) return '';
+  if (S.settings.hideGoalBar) return '<button class="link" data-act="goalBarShow" style="align-self:flex-end">目標を表示する</button>';
+  const many = S.goals.length>1;
+  let h = '<div class="card soft" style="padding:10px 14px;gap:2px"><div class="row" style="align-items:flex-start"><div class="grow" style="display:flex;flex-direction:column;gap:6px">';
+  goalOrder().forEach((g,i) => {
+    h += '<div>'+(i===0?'<span class="xs muted">'+(many?'最終ゴール（いちばん大事な目標）':'最終ゴール')+'</span><br>':'');
+    h += gdot(g.id)+(i===0?'<b>'+esc(g.title)+'</b>':'<span class="small">'+esc(g.title)+'</span>');
+    if (g.due) { const lf = daysBetween(todayKey(), g.due); h += '<br><span class="'+(i===0?'small':'xs muted')+'"'+(many?' style="padding-left:16px"':'')+'>達成日：'+parseKey(g.due).getFullYear()+'年'+fmtDate(g.due)+(lf>=0 ? '（あと'+lf+'日）' : '')+'</span>'; }
+    h += '</div>';
+  });
+  h += '</div><button class="btn ghost sm" data-act="goalBarHide" aria-label="目標の表示を隠す">隠す</button></div></div>';
+  return h;
+}
+function dayStatus(k){
+  const L = S.log[k]; const t = todayKey();
+  if (L && (L.goal>0 || L.tasks>0)) return 'done';
+  if (k < t && plannedGoal(k) && k >= S.created) return 'rest';
+  if (k >= t && plannedGoal(k)) return 'plan';
+  return '';
+}
+function viewCalendar(){
+  const v = ui.calView==='day' ? 'month' : ui.calView;
+  const base = ui.calMonth ? parseKey(ui.calMonth) : new Date(); base.setDate(1);
+  let h = '<div class="wrap">';
+  const title = v==='year' ? base.getFullYear()+'年' : v==='week' ? weekLabel() : base.getFullYear()+'年'+(base.getMonth()+1)+'月';
+  h += '<div class="seg" role="group" aria-label="表示の切り替え">'+['day','week','month','year'].map(x=>'<button class="'+(x===v?'on':'')+'" data-act="calv" data-v="'+x+'">'+({day:'日',week:'週',month:'月',year:'年'})[x]+'</button>').join('')+'</div>';
+  h += '<div class="row"><button class="btn ghost sm" data-act="calPrev" aria-label="前へ">‹</button><h1 class="grow" style="text-align:center;font-size:18px">'+title+'</h1><button class="btn ghost sm" data-act="calNext" aria-label="次へ">›</button></div>';
+  h += goalBar();
+  if (v==='month') {
+    h += '<div class="card"><div class="cal xs muted">'+WD.map((w,i)=>'<span style="'+(i===0?'color:var(--sun)':i===6?'color:var(--sat)':'')+'">'+w+'</span>').join('')+'</div><div class="cal">';
+    const first = base.getDay(); const dim = new Date(base.getFullYear(), base.getMonth()+1, 0).getDate();
+    for (let i=0;i<first;i++) h += '<span></span>';
+    for (let d=1; d<=dim; d++){ const k = dkey(new Date(base.getFullYear(), base.getMonth(), d)); const st = dayStatus(k);
+      const tone = dayTone(k), hn = holidayName(k), gd = isGoalDay(k);
+      h += '<button class="daycell'+(k===todayKey()?' today':'')+(tone?' '+tone:'')+(gd?' goalday':'')+'" data-act="openDay" data-k="'+k+'" aria-label="'+fmtDate(k)+(hn?' '+hn:'')+(gd?' 目標達成日':'')+(st==='done'?' できた':st==='rest'?' お休み':st==='plan'?' 予定あり':'')+'"'+(hn?' title="'+hn+'"':'')+'><span class="d">'+d+'</span>'+(gd?'<span class="gl">達成日</span>':'<span class="dot '+st+'"></span>')+'</button>'; }
+    h += '</div><div class="row wrap-row xs muted" style="justify-content:center;gap:14px"><span class="row" style="gap:4px"><i class="dot done"></i>できた</span><span class="row" style="gap:4px"><i class="dot rest"></i>お休み</span><span class="row" style="gap:4px"><i class="dot plan"></i>予定</span><span class="gl" style="font-size:12px">達成日</span></div></div>';
+    const mk = base.getFullYear()+'-'+pad(base.getMonth()+1);
+    const cnt = Object.keys(S.log).filter(k=>k.startsWith(mk)).reduce((a,k)=>a+(S.log[k].goal||0),0);
+    h += say(cnt>0 ? 'この月は '+cnt+'回、目標タイムを使えました。お休みした日があっても、ちゃんと続いています。' : 'できた日には緑の印がつきます。まずは1回から始めましょう。', cnt>0?'happy':'normal');
+    for (const g of goalOrder()) if (g.milestones) h += '<div class="card"><span class="xs muted">'+gdot(g.id)+'中間目標（途中の目印）'+(S.goals.length>1?'：'+esc(g.title):'')+'</span><span>'+esc(g.milestones)+'</span></div>';
+  } else if (v==='week') {
+    const start = weekStart(ui.calMonth ? parseKey(ui.calMonth) : new Date());
+    for (let i=0;i<7;i++){ const k = dkey(addDays(start,i)); const its = itemsFor(k).filter(x=>x.kind!=='fixed');
+      const tone = dayTone(k), hn = holidayName(k), gd = isGoalDay(k);
+      h += '<button class="card'+(gd?' warm':'')+'" data-act="openDay" data-k="'+k+'" style="text-align:left;cursor:pointer;'+(gd?'border:2px solid var(--warm-line)':'')+'"><span class="row"><b class="grow" style="'+(tone?'color:var(--'+tone+')':'')+'">'+fmtDate(k)+(hn?' <span class="xs">'+hn+'</span>':'')+'</b>'+(gd?'<span class="gl" style="font-size:12px">目標達成日</span>':'')+'<span class="dot '+dayStatus(k)+'"></span></span>';
+      h += its.length ? its.map(x=>'<span class="small">'+esc(x.start)+' '+esc(x.kind==='goal'?'目標タイム'+(x.task?'：'+x.task.title:''):x.title)+(x.done?' ✓':'')+'</span>').join('') : '<span class="small muted">予定なし</span>';
+      h += '</button>'; }
+  } else {
+    h += '<div class="yeargrid">';
+    for (let m=0;m<12;m++){ const f = new Date(base.getFullYear(), m, 1); const dim = new Date(base.getFullYear(), m+1, 0).getDate();
+      h += '<button class="card" style="padding:8px;cursor:pointer;gap:4px" data-act="openMonth" data-k="'+dkey(f)+'"><span class="xs" style="font-weight:700">'+(m+1)+'月</span><span class="mini" aria-hidden="true">'+WD.map((w,i)=>'<b style="'+(i===0?'color:var(--sun)':i===6?'color:var(--sat)':'')+'">'+w+'</b>').join('');
+      for (let i=0;i<f.getDay();i++) h += '<i class="blank"></i>';
+      for (let d=1; d<=dim; d++){ const k = dkey(new Date(base.getFullYear(), m, d)); h += '<i class="'+[isGoalDay(k)?'goal':dayStatus(k)==='done'?'on':'', dayTone(k), k===todayKey()?'today':''].join(' ').trim()+'">'+d+'</i>'; }
+      h += '</span></button>'; }
+    h += '</div><p class="small muted">緑のマスが取り組んだ日、オレンジのマスが目標達成日です。'+(S.goals.some(g=>g.due)?' 達成日は'+goalOrder().filter(g=>g.due).map(g=>parseKey(g.due).getFullYear()+'年'+fmtDate(g.due)).join('、')+'です。':'')+'</p>';
+  }
+  h += '</div>';
+  return h;
+}
+function weekStart(d){ const x = new Date(d.getFullYear(), d.getMonth(), d.getDate()); const wd = (x.getDay()+6)%7; return addDays(x, -wd); }
+function weekLabel(){ const s = weekStart(ui.calMonth ? parseKey(ui.calMonth) : new Date()); const e = addDays(s,6); return (s.getMonth()+1)+'/'+s.getDate()+'〜'+(e.getMonth()+1)+'/'+e.getDate(); }
+
+/* ---------- REVIEW ---------- */
+function viewReview(){
+  const ws = ui.review.weekOf ? parseKey(ui.review.weekOf) : weekStart(new Date());
+  const wk = dkey(ws); const R = S.reviews[wk] || {};
+  let goal=0, tasks=0, ch=0, planned=0, missed=0;
+  for (let i=0;i<7;i++){ const k=dkey(addDays(ws,i)); const L=S.log[k]||{}; goal+=L.goal||0; tasks+=L.tasks||0; ch+=L.challenge?1:0; if(k<=todayKey()){ const g=itemsFor(k).filter(x=>x.kind==='goal'); planned+=g.length; } }
+  missed = Math.max(0, planned-goal);
+  let h = '<div class="wrap">';
+  h += '<div class="row"><button class="btn ghost sm" data-act="revPrev" aria-label="前の週">‹</button><div class="grow" style="text-align:center"><span class="small muted">'+(ws.getMonth()+1)+'月'+ws.getDate()+'日〜'+(addDays(ws,6).getMonth()+1)+'月'+addDays(ws,6).getDate()+'日</span><h1>今週のふりかえり</h1></div><button class="btn ghost sm" data-act="revNext" aria-label="次の週">›</button></div>';
+  let praise;
+  if (goal>0) praise = 'この週は'+goal+'回、目標タイムを使えました。'+(tasks>0?'タスクも'+tasks+'個できています。':'')+'その時間を作れたこと自体が、すばらしい工夫です。';
+  else if (tasks>0 || ch>0) praise = 'できたことがちゃんとあります。'+(tasks>0?'タスク'+tasks+'個、':'')+(ch>0?'ちいさな挑戦'+ch+'回、':'')+'おつかれさまでした。';
+  else praise = '忙しい週もありますよね。ここを開いたことが、もう次の一歩です。';
+  h += say(praise, goal>0||tasks>0?'happy':'normal');
+  h += '<div class="stats"><div class="stat"><div class="num">'+goal+'回</div><span class="xs muted">目標タイム</span></div><div class="stat"><div class="num">'+tasks+'個</div><span class="xs muted">できたタスク</span></div><div class="stat"><div class="num" style="color:var(--warm)">'+ch+'回</div><span class="xs muted">ちいさな挑戦</span></div></div>';
+  if (S.goals.length>1) { const end = dkey(addDays(ws,6)); h += '<section class="card" style="gap:6px"><h2>目標ごとの進み具合</h2>';
+    for (const g of goalOrder()) { const all = S.tasks.filter(t=>t.goalId===g.id && !children(t.id).length); const wkDone = all.filter(t=>t.done && t.doneAt>=wk && t.doneAt<=end).length;
+      h += '<div class="row" style="gap:0">'+gdot(g.id)+'<span class="grow small">'+esc(g.title)+'</span><span class="xs muted">今週 '+wkDone+'個 ／ 全体 '+all.filter(t=>t.done).length+'/'+all.length+'</span></div>'; }
+    h += '</section>'; }
+  h += '<section style="display:flex;flex-direction:column;gap:8px"><h2>'+(missed>0?'できなかった日、何が邪魔しましたか？':'もっと進めやすくするには？')+'</h2><p class="xs muted">選ぶと、合いそうな工夫をお伝えします。</p><div class="row wrap-row">';
+  for (const r of REASONS) h += '<button class="chip'+(R.reason===r.id?' on':'')+'" data-act="reason" data-id="'+r.id+'" aria-pressed="'+(R.reason===r.id)+'">'+r.label+'</button>';
+  h += '</div>';
+  const rr = REASONS.find(x=>x.id===R.reason);
+  if (rr) { h += '<div class="card warm"><span class="xs" style="color:var(--warm);font-weight:700">来週の工夫</span><p>'+esc(rr.tip)+'</p>';
+    if (rr.feat===5) h += '<a class="btn warmb sm" href="#setup" data-act="editGoal">目標を見直す</a>';
+    if (rr.feat===4 || rr.feat===1) h += '<a class="btn warmb sm" href="#day">予定を調整する</a>';
+    h += '</div>'; }
+  h += '</section>';
+  h += '<label class="fld">ひとことメモ（任意）<textarea id="rev-note" placeholder="例：朝は眠くて無理だった。夜に変えてみる">'+esc(R.note||'')+'</textarea></label><button class="btn ghost" data-act="saveNote">メモを保存</button>';
+  // monthly check: show if goal not checked for 28+ days
+  if (G() && (!G().checkedAt || daysBetween(G().checkedAt, todayKey())>=28)) {
+    h += '<section class="card soft"><h2>月に1回の目標チェック</h2><p class="small">「'+esc(G().title)+'」</p>';
+    h += yesno('m1','達成できたかどうか、数字や結果で確かめられますか？', ui.review.m1);
+    h += yesno('m2','今も、本当に達成したいと思えますか？', ui.review.m2);
+    if (ui.review.m1===true && ui.review.m2===true) h += '<button class="btn sm" data-act="monthOk">このまま進む</button>';
+    if (ui.review.m1===false || ui.review.m2===false) h += '<p class="small">目標を今の自分に合わせて直してみましょう。</p><a class="btn sm" href="#setup" data-act="editGoal">目標を直す</a>';
+    h += '</section>';
+  }
+  h += '</div>';
+  return h;
+}
+
+/* ---------- MORE (goal, tasks, settings, wallpaper) ---------- */
+function viewMore(){
+  let h = '<div class="wrap"><h1>目標・設定</h1>';
+  const n = S.goals.length;
+  h += '<section class="card"><div class="row"><h2 class="grow">目標</h2><span class="small muted">'+n+' / '+MAX_GOALS+'</span></div>';
+  if (!n) h += '<p class="small muted">まだありません。</p>';
+  for (const g of goalOrder()) {
+    const main = g===G();
+    h += '<div style="border-top:1px solid var(--line);padding-top:10px;display:flex;flex-direction:column;gap:4px">';
+    h += '<div class="row" style="align-items:flex-start;gap:0">'+(n>1?'<i class="gdot" style="background:'+g.color+';margin-top:8px" aria-hidden="true"></i>':'')+'<b class="grow">'+esc(g.title)+'</b>'+(main&&n>1?'<span class="badge">いちばん大事</span>':'')+'</div>';
+    if (g.due) h += '<span class="small">達成日：'+fmtDate(g.due)+'</span>';
+    if (g.criteria) h += '<span class="small">達成の基準：'+esc(g.criteria)+'</span>';
+    if (g.reason) h += '<span class="small">理由：'+esc(g.reason)+'</span>';
+    if (g.future) h += '<span class="small">その先の未来：'+esc(g.future)+'</span>';
+    h += '<div class="row wrap-row"><a class="btn ghost sm" href="#setup" data-act="editGoal" data-id="'+g.id+'">見直す</a>'+(!main?'<button class="btn ghost sm" data-act="setMain" data-id="'+g.id+'">いちばん大事にする</button>':'')+'<button class="link" data-act="delGoalAsk" data-id="'+g.id+'">削除</button></div>';
+    if (ui.delAsk===g.id) h += '<div class="card warm" style="padding:10px 12px"><p class="small">「'+esc(g.title)+'」と、この目標のタスク'+S.tasks.filter(t=>t.goalId===g.id).length+'個を削除します。元には戻せません。</p><div class="row"><button class="btn warmb sm" data-act="delGoalDo" data-id="'+g.id+'">削除する</button><button class="link" data-act="delGoalCancel">やめる</button></div></div>';
+    h += '</div>';
+  }
+  if (n >= MAX_GOALS) h += '<p class="small muted" style="border-top:1px solid var(--line);padding-top:10px">目標は'+MAX_GOALS+'つまでです。新しく追加するときは、終わった目標や今は休ませたい目標を削除してください。</p>';
+  else if (n >= 3 && ui.addAsk) h += '<div class="card warm"><b style="color:var(--warm)">本当にだいじょうぶですか？</b><p class="small">目標が多いと、1つにかけられる時間が少なくなって、進んでいる実感を持ちにくくなります。書いておきたいだけなら、追加しても大丈夫です。毎日の目標タイムは「いちばん大事な目標」を中心にしましょう。</p><div class="row wrap-row"><a class="btn warmb sm" href="#setup" data-act="newGoal">それでも追加する</a><button class="link" data-act="addCancel">やめておく</button></div></div>';
+  else if (n >= 3) h += '<button class="btn ghost" data-act="addAsk">＋ 目標を追加</button>';
+  else h += '<a class="btn ghost" href="#setup" data-act="newGoal">'+(n?'＋ 目標を追加':'目標を作る')+'</a>';
+  h += '</section>';
+  h += '<section class="card"><h2>タスク一覧</h2>';
+  const ol = ordered();
+  if (!ol.length) h += '<p class="small muted">まだありません。</p>';
+  for (const g of goalOrder()) {
+    const rows = ol.filter(o=>o.t.goalId===g.id);
+    if (n>1) h += '<div class="row" style="margin-top:6px;gap:0">'+gdot(g.id)+'<b class="small grow">'+esc(g.title)+'</b></div>';
+    if (n>1 && !rows.length) h += '<p class="xs muted">まだありません。</p>';
+    for (const {t,depth} of rows) h += '<div class="row" style="padding-left:'+(depth*18)+'px"><input type="checkbox" id="tl-'+t.id+'" data-act="toggleTask" data-id="'+t.id+'" '+(t.done?'checked':'')+' '+(children(t.id).length?'disabled':'')+' style="width:22px;height:22px;accent-color:var(--accent)" aria-label="'+esc(t.title)+'"><label for="tl-'+t.id+'" class="grow small" style="'+(t.done?'text-decoration:line-through;color:var(--muted)':'')+'">'+esc(t.title)+(t.minutes?' <span class="xs muted">約'+t.minutes+'分</span>':'')+'</label><button class="link" data-act="moveUp" data-id="'+t.id+'" aria-label="上へ">↑</button><button class="link" data-act="delTask" data-id="'+t.id+'" aria-label="削除">削除</button></div>';
+  }
+  h += '<div class="row wrap-row" style="margin-top:6px">'+(n>1?'<select id="nt-goal" aria-label="どの目標のタスク？" style="width:auto;max-width:100%">'+goalOrder().map(g=>'<option value="'+g.id+'"'+(ui.ntGoal===g.id?' selected':'')+'>'+esc(g.title)+'</option>').join('')+'</select>':'')+'<input type="text" id="nt-title" placeholder="新しいタスク" aria-label="新しいタスク" style="flex:1;min-width:160px;width:auto"><button class="btn sm" data-act="addTask">追加</button></div><p class="xs muted">上にあるタスクから順に、目標タイムへ自動で入ります。'+(n>1?'「おまかせ」の目標タイムには、いちばん大事な目標のタスクから入ります。':'')+'</p></section>';
+  h += '<section class="card"><h2>目標の壁紙</h2><p class="small muted">目標と「なぜ」が入った壁紙を作って保存できます。ロック画面やデスクトップに設定すると、毎日目に入ります。</p>';
+  if (n>1) h += '<label class="fld">壁紙に入れる目標<select id="wp-goal" data-act="wpGoal">'+goalOrder().map(g=>'<option value="'+g.id+'"'+(wpGoal()===g?' selected':'')+'>'+esc(g.title)+'</option>').join('')+'</select></label>';
+  h += '<div class="seg" style="grid-template-columns:repeat(2,minmax(0,1fr))" role="group" aria-label="壁紙のサイズ"><button class="'+(ui.wp!=='pc'?'on':'')+'" data-act="wp" data-v="phone">スマホ用</button><button class="'+(ui.wp==='pc'?'on':'')+'" data-act="wp" data-v="pc">PC用</button></div>';
+  h += '<label class="fld">'+esc(S.settings.partner)+'からのひとこと（壁紙に入ります）<input type="text" id="wp-msg" data-act="wpMsg" maxlength="50" value="'+esc(wpMsg())+'"></label><div class="row wrap-row" style="gap:6px">'+WP_MSGS.map((m,i)=>'<button class="chip" style="min-height:36px;font-size:13px" data-act="wpPreset" data-i="'+i+'">'+esc(m)+'</button>').join('')+'</div>';
+  h += '<canvas id="wpc" class="prev" aria-label="壁紙のプレビュー"></canvas><button class="btn" data-act="saveWp">画像を保存</button></section>';
+  h += '<section class="card"><h2>相棒</h2><div class="row">'+pipo(64,'wave')+'<label class="fld grow">名前<input type="text" id="pt-name" value="'+esc(S.settings.partner)+'"></label></div><div class="row" role="group" aria-label="色">';
+  for (const [c,n] of COLORS) h += '<button class="sw'+(S.settings.color===c?' on':'')+'" style="background:'+c+'" data-act="color" data-c="'+c+'" aria-label="'+n+'" aria-pressed="'+(S.settings.color===c)+'"></button>';
+  h += '</div><button class="btn ghost sm" data-act="savePartner" style="align-self:flex-start">名前を保存</button></section>';
+  h += '<section class="card"><h2>始める前のチェック項目</h2><textarea id="env-list" aria-label="チェック項目（1行に1つ）">'+esc(S.env.join('\n'))+'</textarea><button class="btn ghost sm" data-act="saveEnv" style="align-self:flex-start">保存</button></section>';
+  h += '<section class="card"><h2>記録のバックアップ</h2><p class="small muted">記録はこの端末のブラウザの中に保存されています。端末を変えるときや、念のためのバックアップに使ってください。Claude版の記録も、書き出したファイルをここで読み込むと引き継げます。</p><div class="row wrap-row"><button class="btn ghost sm" data-act="exportData">記録を書き出す</button><button class="btn ghost sm" data-act="importAsk">記録を読み込む</button></div><input type="file" id="import-file" accept="application/json,.json" hidden></section>';
+  h += '<p class="xs muted">通知について：このページを開いている間、予定の5分前からお知らせを表示します。スマホの通知として届く機能は、今後の予定です。</p>';
+  h += '</div>';
+  return h;
+}
+let wpTok = 0, wpFontWait = false;
+const NOSTART = '、。，．・：；！？）」』ーぁぃぅぇぉっゃゅょゎァィゥェォッャュョヮ…';
+function drawWallpaper(){
+  const c = document.getElementById('wpc'); const g = wpGoal(); if (!c || !g) return;
+  if (document.fonts && document.fonts.status!=='loaded' && !wpFontWait) { wpFontWait = true; document.fonts.ready.then(()=>drawWallpaper()); }
+  const pc = ui.wp==='pc'; const W = pc?1920:1080, H = pc?1080:1920; c.width=W; c.height=H;
+  const x = c.getContext('2d'); const col = S.settings.color||'#2F6F60'; const gcol = S.goals.length>1 ? g.color : col;
+  x.fillStyle='#FBF8F3'; x.fillRect(0,0,W,H);
+  x.fillStyle=gcol; x.globalAlpha=.08; x.beginPath(); x.arc(W*0.85,H*0.15,W*0.35,0,7); x.fill(); x.globalAlpha=1;
+  const f = "'M PLUS Rounded 1c', sans-serif"; const font = (sz,wt) => wt+' '+sz+'px '+f;
+  // split text into lines that fit maxW; cut with "…" after max lines
+  const split = (t, maxW, sz, wt, max) => { x.font=font(sz,wt); const out=[]; let line=''; for (const ch of String(t)) { if (ch==='\n') { out.push(line); line=''; continue; } if (x.measureText(line+ch).width>maxW && line && !NOSTART.includes(ch)) { out.push(line); line=ch; } else line+=ch; } if (line) out.push(line);
+    if (max && out.length>max) { out.length=max; let l=out[max-1]; while (l && x.measureText(l+'…').width>maxW) l=l.slice(0,-1); out[max-1]=l+'…'; } return out; };
+  const block = (t, maxW, sz, wt, y, color, lh, max, lx) => { const ls=split(t,maxW,sz,wt,max); x.font=font(sz,wt); x.fillStyle=color; for (const l of ls) { x.fillText(l, lx, y+sz); y+=sz*lh; } return y; };
+  const rr = (X,Y,w,h,r) => { x.beginPath(); x.moveTo(X+r,Y); x.arcTo(X+w,Y,X+w,Y+h,r); x.arcTo(X+w,Y+h,X,Y+h,r); x.arcTo(X,Y+h,X,Y,r); x.arcTo(X,Y,X+w,Y,r); x.closePath(); };
+  const left = pc?160:100, maxW = pc?1000:880;
+  // goal text (top area on phone is left for the lock-screen clock). "なぜ" and "その先に" are shown in full;
+  // their font shrinks a little when they are long, so the partner below never overlaps them.
+  const name = S.settings.partner||'ピポ'; const msz = pc?28:32, pad = pc?22:24, lh = 1.45, nameSz = pc?26:28;
+  const s0 = pc ? 160 : 140, bw0 = pc ? 420 : W - left*2 - s0 - 34;
+  const msgLines = split(wpMsg(), bw0-2*pad-msz, msz, '700', 4); const bh0 = msgLines.length*msz*lh + 2*pad;
+  const partnerH = pc ? 0 : Math.max(s0 + nameSz + 16, bh0) + 70;
+  const limit = pc ? H - 90 : H - 200 - partnerH;
+  const textEnd = (y0, rsz, draw) => {
+    const B = (t, sz, wt, y, color, l, max) => draw ? block(t, maxW, sz, wt, y, color, l, max, left) : y + split(t, maxW, sz, wt, max).length*sz*l;
+    let y = y0;
+    y = B('わたしの目標', pc?40:46, '500', y, '#5F5B55', 1.4, 1);
+    y = B(g.title, pc?80:92, '700', y+16, '#2B2A28', 1.3, 3);
+    if (g.due) y = B(parseKey(g.due).getFullYear()+'年'+fmtDate(g.due)+' まで', pc?40:46, '700', y+10, gcol, 1.4, 1);
+    if (g.reason) y = B('なぜ：'+g.reason, rsz, '400', y+30, '#5F5B55', 1.5, 0);
+    if (g.future) y = B('その先に：'+g.future, rsz, '400', y+10, '#5F5B55', 1.5, 0);
+    return y;
+  };
+  let y0 = pc ? 200 : Math.round(H*0.25), rsz = pc ? 36 : 42; const minR = pc ? 24 : 28;
+  while (rsz > minR && textEnd(y0, rsz, false) > limit) rsz -= 2;
+  if (textEnd(y0, rsz, false) > limit) y0 = Math.max(pc ? 80 : Math.round(H*0.12), y0 - (textEnd(y0, rsz, false) - limit));
+  const y = textEnd(y0, rsz, true);
+  // partner + message, in its own area so it never covers the goal text
+  let s, px, py, bx, by, bw, ls, bh;
+  if (pc) {
+    s = s0; bw = bw0; bx = W-140-bw; ls = msgLines; bh = bh0;
+    const total = bh + 40 + s + nameSz + 16; by = Math.max(80, Math.round((H-total)/2)); py = by + bh + 40; px = bx + (bw-s)/2;
+  } else {
+    const top = y + 70, bottom = H - 200;
+    s = (top + Math.max(s0 + nameSz + 16, bh0) <= bottom) ? s0 : 0;
+    px = left; bx = s ? left + s + 34 : left; bw = W - left - bx;
+    ls = s ? msgLines : split(name+'：'+wpMsg(), bw-2*pad-msz, msz, '700', 4); bh = ls.length*msz*lh + 2*pad;
+    py = top; by = top + Math.max(0, Math.round((s - bh)/2));
+  }
+  x.fillStyle='#FFFFFF'; x.strokeStyle=col; x.lineWidth=4; rr(bx,by,bw,bh,28); x.fill(); x.stroke();
+  if (s) { x.beginPath();
+    if (pc) { const cx=bx+bw/2; x.moveTo(cx-20,by+bh-3); x.lineTo(cx,by+bh+28); x.lineTo(cx+20,by+bh-3); }
+    else { const cy=by+Math.min(bh/2, s/2); x.moveTo(bx+3,cy-20); x.lineTo(bx-28,cy); x.lineTo(bx+3,cy+20); }
+    x.fillStyle='#FFFFFF'; x.fill(); x.stroke();
+    x.fillStyle='#FFFFFF'; if (pc) x.fillRect(bx+bw/2-18, by+bh-6, 36, 5); else { const cy=by+Math.min(bh/2, s/2); x.fillRect(bx-1, cy-18, 6, 36); } }
+  x.font=font(msz,'700'); x.fillStyle='#2B2A28'; ls.forEach((l,i)=>x.fillText(l, bx+pad, by+pad+msz*0.9+i*msz*lh));
+  if (!s) return;
+  x.font=font(nameSz,'500'); x.fillStyle='#5F5B55'; x.textAlign='center'; x.fillText(name, px+s/2, py+s+nameSz+6); x.textAlign='left';
+  const tok = ++wpTok; const img = new Image();
+  img.onload = () => { if (tok===wpTok) x.drawImage(img, px, py, s, s); };
+  img.src = 'data:image/svg+xml;charset=utf-8,'+encodeURIComponent(pipo(64,'happy').replace('<svg ','<svg xmlns="http://www.w3.org/2000/svg" '));
+}
+
+/* ---------- WELCOME BACK ---------- */
+function viewWelcome(){
+  const t = nextTasks()[0];
+  let h = '<div class="overlay" role="dialog" aria-modal="true" aria-labelledby="wb-h"><div class="wrap" style="padding-top:40px;padding-bottom:40px">';
+  h += '<div style="display:flex;justify-content:center">'+pipo(112,'wave')+'</div><h1 id="wb-h" style="text-align:center;font-size:26px">おかえりなさい</h1>';
+  h += '<p style="text-align:center">'+ui.welcomeDays+'日ぶりですね。<br>戻ってこれたことが、一番大事な一歩です。</p>';
+  h += '<div class="card"><span class="xs muted">思い出してみましょう</span><b>'+esc(G().title)+'</b>'+(G().future?'<span class="small">達成したら：'+esc(G().future)+'</span>':(G().reason?'<span class="small">なぜ：'+esc(G().reason)+'</span>':''))+'</div>';
+  if (t) h += '<div class="card soft"><span class="xs" style="font-weight:700;color:var(--accent)">今日はこれだけで大丈夫</span><b>'+esc(t.title)+' を3分だけ</b></div>';
+  h += '<p class="small muted" style="text-align:center">これまでに取り組んだ日：合計 <b>'+activeDays()+'日</b>（消えていません）</p>';
+  if (t) h += '<button class="btn block" data-act="wbStart" data-id="'+t.id+'">3分だけやってみる</button>';
+  h += '<button class="btn ghost block" data-act="wbReset">予定を組み直す</button><button class="link" data-act="wbClose" style="align-self:center">ホームを見る</button></div></div>';
+  return h;
+}
+
+/* ---------- actions ---------- */
+function findItem(k, key){ return itemsFor(k).find(i=>i.key===key); }
+function markItem(k, it, on){
+  S.done[k] = S.done[k]||{};
+  if (on) { S.done[k][it.key] = {taskId: it.task?it.task.id:null}; } else delete S.done[k][it.key];
+}
+document.addEventListener('click', async (e) => {
+  const b = e.target.closest('[data-act]'); if (!b) return;
+  const a = b.dataset.act; const k = todayKey();
+  if (b.tagName==='INPUT') return; // handled by change
+  switch(a){
+    case 'dismissMsg': ui.msg=null; break;
+    case 'goalBarHide': S.settings.hideGoalBar=true; save(); toast('目標の表示を隠しました。「目標を表示する」で戻せます。'); break;
+    case 'goalBarShow': S.settings.hideGoalBar=false; save(); break;
+    case 'challenge': logOf(k).challenge=true; ui.praise='初めてのことに挑戦できましたね。挑戦する力が育っています。'; save(); break;
+    case 'challengeNext': S.settings.challengeOffset=S.settings.challengeOffset||{}; S.settings.challengeOffset={[k]:((S.settings.challengeOffset[k]||0)+1)}; save(); break;
+    case 'split': ui.splitFor=b.dataset.id; break;
+    case 'splitCancel': ui.splitFor=null; break;
+    case 'splitSave': { const lines=(document.getElementById('split-text').value||'').split('\n').map(s=>s.trim()).filter(Boolean); const parent=S.tasks.find(t=>t.id===b.dataset.id); if(parent && lines.length){ const idx=S.tasks.indexOf(parent); const kids=lines.map(l=>({id:uid(),title:l,minutes:Math.max(5,Math.round((parent.minutes||15)/lines.length)),done:false,parentId:parent.id,goalId:parent.goalId})); S.tasks.splice(idx+1,0,...kids); ui.praise='小さく分けられるのは、続ける人のやり方です。まずは「'+lines[0]+'」から。'; save(); } ui.splitFor=null; break; }
+    case 'start': { const it=findItem(k,b.dataset.key); if(!it) return; const r = S.routine.find(x=>x.id===it.rid); const mins = Math.max(1, (toMin(it.end)-toMin(it.start)) || 15); ui.timer={phase:'env', key:it.key, k, title: it.task?it.task.title:'目標タイム', taskId: it.task?it.task.id:null, minutes: mins, env:{}}; break; }
+    case 'timerGo': { const m=Number(document.getElementById('tm-min').value)||ui.timer.minutes; ui.timer.minutes=m; ui.timer.phase='run'; ui.timer.endAt=Date.now()+m*60000; startTick(); try{ if(navigator.wakeLock) ui.wl = await navigator.wakeLock.request('screen'); }catch(_){} break; }
+    case 'timerCancel': ui.timer=null; try{ui.wl&&ui.wl.release();}catch(_){} ui.praise='ここまで来られただけでも十分です。また次の目標タイムで。'; break;
+    case 'timerDone': { const T=ui.timer; const L=logOf(T.k); L.goal=(L.goal||0)+1; L.minutes=(L.minutes||0)+Math.round((T.minutes*60000-Math.max(0,T.endAt-Date.now()))/60000);
+      if (T.key && !T.key.startsWith('free')) { S.done[T.k]=S.done[T.k]||{}; S.done[T.k][T.key]={taskId:T.taskId}; }
+      const t=S.tasks.find(x=>x.id===T.taskId); if(t && !t.done) setDone(t,true,T.k);
+      ui.timer=null; try{ui.wl&&ui.wl.release();}catch(_){} ui.praise=PRAISE[Math.floor(Math.random()*PRAISE.length)]; save(); location.hash='#home'; break; }
+    case 'tpl': { const W=ui.wiz; W.tpl=b.dataset.id; break; }
+    case 'yn': { const v=b.dataset.v==='1'; const q=b.dataset.q; if(q==='m1'||q==='m2'){ ui.review[q]=v; } else { readWiz(); ui.wiz[q]=v; } break; }
+    case 'wday': { readWiz(); const d=Number(b.dataset.d); const W=ui.wiz; W.goalDays = W.goalDays.includes(d) ? W.goalDays.filter(x=>x!==d) : W.goalDays.concat(d); break; }
+    case 'wizNext': if(b.disabled) return; readWiz(); ui.wiz.step++; window.scrollTo(0,0); break;
+    case 'wizBack': readWiz(); if(ui.wiz.step===0){ if(G()){ ui.wiz=null; ui.wizGoal=null; location.hash='#more'; } return; } ui.wiz.step--; break;
+    case 'wizSave': wizSave(true); return;
+    case 'wizSaveNoSlot': wizSave(false); return;
+    case 'editGoal': ui.wiz=null; ui.wizGoal=b.dataset.id||null; ui.review.m1=null; ui.review.m2=null; return;
+    case 'newGoal': if (S.goals.length>=MAX_GOALS) { e.preventDefault(); toast('目標は'+MAX_GOALS+'つまでです。'); return; } ui.wiz=null; ui.wizGoal='new'; ui.addAsk=false; return;
+    case 'addAsk': ui.addAsk=true; break;
+    case 'addCancel': ui.addAsk=false; break;
+    case 'setMain': { S.mainGoal=b.dataset.id; save(); const g=goalById(b.dataset.id); toast('「'+(g?g.title:'')+'」をいちばん大事な目標にしました。'); break; }
+    case 'delGoalAsk': ui.delAsk=b.dataset.id; break;
+    case 'delGoalCancel': ui.delAsk=null; break;
+    case 'delGoalDo': { const id=b.dataset.id; S.goals=S.goals.filter(g=>g.id!==id); S.tasks=S.tasks.filter(t=>t.goalId!==id); for (const r of S.routine) if (r.goalId===id) r.goalId=null; for (const o of S.oneoffs) if (o.goalId===id) o.goalId=null; if (S.mainGoal===id) S.mainGoal=S.goals.length?S.goals[0].id:null; if (ui.wpGoal===id) ui.wpGoal=null; ui.delAsk=null; save(); toast('削除しました。'); break; }
+    case 'wpPreset': S.settings.wpMsg=WP_MSGS[Number(b.dataset.i)]||''; save(); break;
+    case 'monthOk': G().checkedAt=k; ui.review={weekOf:ui.review.weekOf}; save(); toast('このまま進みましょう。'); break;
+    case 'dayPrev': ui.day=dkey(addDays(parseKey(ui.day),-1)); ui.editBlk=null; break;
+    case 'dayNext': ui.day=dkey(addDays(parseKey(ui.day),1)); ui.editBlk=null; break;
+    case 'dayToday': ui.day=k; break;
+    case 'calv': { const v=b.dataset.v; if(v==='day'){ location.hash='#day'; return; } ui.calView=v; if(route()!=='calendar'){ ui.calMonth=ui.day; location.hash='#calendar'; return; } break; }
+    case 'calPrev': case 'calNext': { const dir=a==='calPrev'?-1:1; const cur = ui.calMonth?parseKey(ui.calMonth):new Date(); let n; if(ui.calView==='year') n=new Date(cur.getFullYear()+dir,0,1); else if(ui.calView==='week') n=addDays(cur,7*dir); else n=new Date(cur.getFullYear(),cur.getMonth()+dir,1); ui.calMonth=dkey(n); break; }
+    case 'openDay': ui.day=b.dataset.k; ui.editBlk=null; location.hash='#day'; return;
+    case 'openMonth': ui.calMonth=b.dataset.k; ui.calView='month'; break;
+    case 'editBlk': ui.editBlk=b.dataset.key; render(); document.getElementById('eb-start')?.focus(); return;
+    case 'ebClose': ui.editBlk=null; break;
+    case 'ebSkip': case 'ebSave': case 'ebDone': { const it=findItem(ui.day, ui.editBlk); if(!it) break; const d=ui.day;
+      if (a==='ebDone') { const on=!it.done; markItem(d,it,on); if(it.task && it.kind!=='goal') setDone(it.task,on,d); if(it.kind==='goal'){ const L=logOf(d); L.goal=Math.max(0,(L.goal||0)+(on?1:-1)); if(on&&it.task&&!it.task.done) setDone(it.task,true,d);} }
+      else if (it.oid) { const o=S.oneoffs.find(x=>x.id===it.oid); if(a==='ebSkip') S.oneoffs=S.oneoffs.filter(x=>x.id!==it.oid); else { o.start=document.getElementById('eb-start').value||o.start; o.end=document.getElementById('eb-end').value||o.end; } }
+      else { S.skips[d]=(S.skips[d]||[]).concat(it.rid); if(a==='ebSave'){ S.oneoffs.push({id:uid(),date:d,start:document.getElementById('eb-start').value||it.start,end:document.getElementById('eb-end').value||it.end,title:it.title,kind:it.kind,goalId:it.goalId||null}); } }
+      ui.editBlk=null; save(); toast(a==='ebSkip'?'この日はお休みにしました。':'変更しました。'); break; }
+    case 'addOne': { const title=document.getElementById('add-title').value.trim(); const tsel=document.getElementById('add-task'); const taskId=tsel?tsel.value:''; const kind=document.getElementById('add-kind').value; const t=S.tasks.find(x=>x.id===taskId);
+      if(!title && !t && kind!=='goal'){ toast('内容を入れるか、タスクを選んでください。'); return; }
+      S.oneoffs.push({id:uid(),date:ui.day,start:document.getElementById('add-start').value||'21:00',end:document.getElementById('add-end').value||'21:15',title:title||(t?t.title:'目標タイム'),kind:t?'task':kind,taskId:t?t.id:null,goalId:(!t && kind==='goal' && document.getElementById('add-goal')) ? (document.getElementById('add-goal').value||null) : null}); save(); toast('追加しました。'); break; }
+    case 'addRoutine': { const kind=document.getElementById('rt-kind').value; const title=document.getElementById('rt-title').value.trim(); const days=[...document.querySelectorAll('#rt-days input:checked')].map(i=>Number(i.value)); if(!days.length){ toast('曜日を1つ以上選んでください。'); return; } if(kind!=='goal' && !title){ toast('内容を入れてください。'); return; }
+      S.routine.push({id:uid(),kind,title:kind==='goal'?'目標タイム':title,start:document.getElementById('rt-start').value||'07:00',end:document.getElementById('rt-end').value||'07:15',days,goalId:(kind==='goal' && document.getElementById('rt-goal')) ? (document.getElementById('rt-goal').value||null) : null}); save(); toast('追加しました。'); break; }
+    case 'delRoutine': S.routine=S.routine.filter(r=>r.id!==b.dataset.id); save(); break;
+    case 'reason': { const wk=dkey(ui.review.weekOf?parseKey(ui.review.weekOf):weekStart(new Date())); S.reviews[wk]=Object.assign({},S.reviews[wk],{reason:b.dataset.id}); save(); break; }
+    case 'saveNote': { const wk=dkey(ui.review.weekOf?parseKey(ui.review.weekOf):weekStart(new Date())); S.reviews[wk]=Object.assign({},S.reviews[wk],{note:document.getElementById('rev-note').value}); save(); toast('メモを保存しました。'); return; }
+    case 'revPrev': case 'revNext': { const cur=ui.review.weekOf?parseKey(ui.review.weekOf):weekStart(new Date()); ui.review.weekOf=dkey(addDays(cur,a==='revPrev'?-7:7)); break; }
+    case 'addTask': { const v=document.getElementById('nt-title').value.trim(); if(!v) return; const gs=document.getElementById('nt-goal'); const gid=(gs&&gs.value)||(G()&&G().id); if(!gid){ toast('先に目標を作りましょう。'); return; } ui.ntGoal=gid; S.tasks.push({id:uid(),title:v,minutes:15,done:false,parentId:null,goalId:gid}); save(); break; }
+    case 'delTask': { const id=b.dataset.id; const kill=new Set([id]); let grew=true; while(grew){ grew=false; for(const t of S.tasks) if(t.parentId&&kill.has(t.parentId)&&!kill.has(t.id)){ kill.add(t.id); grew=true; } } S.tasks=S.tasks.filter(t=>!kill.has(t.id)); save(); break; }
+    case 'moveUp': { const t=S.tasks.find(x=>x.id===b.dataset.id); const sib=S.tasks.filter(x=>(x.parentId||null)===(t.parentId||null) && x.goalId===t.goalId); const i=sib.indexOf(t); if(i>0){ const prev=sib[i-1]; const ai=S.tasks.indexOf(t), bi=S.tasks.indexOf(prev); S.tasks[ai]=prev; S.tasks[bi]=t; save(); } break; }
+    case 'wp': ui.wp=b.dataset.v; break;
+    case 'saveWp': { const c=document.getElementById('wpc'); if(!c) return; c.toBlob(blob => { const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='chiisana-ippo-wallpaper-'+(ui.wp==='pc'?'pc':'phone')+'.png'; document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(a.href),4000); }, 'image/png'); return; }
+    case 'exportData': { const blob=new Blob([JSON.stringify(S,null,1)],{type:'application/json'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='chiisana-ippo-backup-'+todayKey()+'.json'; document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(a.href),4000); toast('バックアップを保存しました。'); return; }
+    case 'importAsk': document.getElementById('import-file').click(); return;
+    case 'color': S.settings.color=b.dataset.c; save(); break;
+    case 'savePartner': { const v=document.getElementById('pt-name').value.trim(); if(v){ S.settings.partner=v; save(); toast('名前を「'+v+'」にしました。'); } break; }
+    case 'saveEnv': S.env=document.getElementById('env-list').value.split('\n').map(s=>s.trim()).filter(Boolean); save(); toast('保存しました。'); break;
+    case 'wbStart': { const t=S.tasks.find(x=>x.id===b.dataset.id); ui.welcome=false; ui.timer={phase:'env', key:'free:'+t.id, k, title:t.title, taskId:t.id, minutes:3, env:{}}; break; }
+    case 'wbReset': ui.welcome=false; location.hash='#day'; return;
+    case 'wbClose': ui.welcome=false; break;
+    default: return;
+  }
+  render();
+});
+document.addEventListener('change', (e) => {
+  const el = e.target; const a = el.dataset && el.dataset.act; if (!a) return;
+  const k = todayKey();
+  if (a==='toggle') { const key=el.dataset.key; if (key.startsWith('t:')) { const t=S.tasks.find(x=>x.id===key.slice(2)); if(t){ setDone(t, el.checked, k); if(el.checked) ui.praise=PRAISE[Math.floor(Math.random()*PRAISE.length)]; } }
+    else { const it=findItem(k,key); if(it){ markItem(k,it,el.checked); if(it.task) setDone(it.task, el.checked, k); else { const L=logOf(k); L.tasks=Math.max(0,(L.tasks||0)+(el.checked?1:-1)); } if(el.checked) ui.praise=PRAISE[Math.floor(Math.random()*PRAISE.length)]; } }
+    save(); render(); }
+  if (a==='toggleTask') { const t=S.tasks.find(x=>x.id===el.dataset.id); if(t){ setDone(t, el.checked, k); save(); render(); } }
+  if (a==='envck') { ui.timer.env[el.dataset.i]=el.checked; }
+  if (a==='wpGoal') { ui.wpGoal=el.value; drawWallpaper(); }
+});
+document.addEventListener('change', (e) => { if (e.target.id!=='import-file') return; const f=e.target.files[0]; if(!f) return; const r=new FileReader(); r.onload=()=>{ try { const d=JSON.parse(r.result); if(!d || typeof d!=='object' || !(d.goals||d.goal)) throw 0; S=Object.assign(blankState(), d); migrate(); save(); ui.wiz=null; toast('読み込みました。'); render(); } catch(_){ toast('このファイルは読み込めませんでした。'); } }; r.readAsText(f); e.target.value=''; });
+document.addEventListener('input', (e) => { if (e.target.id==='wp-msg') { S.settings.wpMsg=e.target.value; save(); drawWallpaper(); } });
+document.addEventListener('keydown', (e) => { if (e.key==='Enter' && e.target.id==='nt-title') { e.preventDefault(); document.querySelector('[data-act="addTask"]').click(); } });
+
+/* ---------- boot ---------- */
+function afterLoad(){
+  const t = todayKey();
+  if (migrate()) save();
+  if (G() && S.lastOpen && S.lastOpen < t) { const gap = daysBetween(S.lastOpen, t); if (gap >= 3) { ui.welcome = true; ui.welcomeDays = gap; } }
+  if (S.lastOpen !== t) { S.lastOpen = t; save(); }
+  ready = true; render();
+}
+render();
+(async () => {
+  storeMode = 'web';
+  try { const raw = localStorage.getItem('chiisana-ippo'); if (raw) S = Object.assign(blankState(), JSON.parse(raw)); } catch(e){}
+  afterLoad();
+})();
+})();
+</script>
+
+</body>
+</html>
